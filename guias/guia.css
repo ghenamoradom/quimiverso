@@ -43,7 +43,9 @@ main.guia{max-width:860px}
 .qs li{margin-bottom:6px}
 .qs .lines{margin-top:6px}
 
+.printlogo{display:none}
 @media print{
+  .printlogo{display:block;height:44px;width:auto;align-self:flex-start;margin-bottom:6px}
   :root{--bg:#fff;--panel:#fff;--panel2:#f3f5f5;--line:#c9d1d0;--line2:#9aa7a4;--fg:#111;--muted:#444;--accent:#8a6500;--acc-soft:#fff8e1;--c1:#1f5f9e}
   body{background:#fff;color:#111;font-size:12pt}
   .top,.foot,.noprint,.toc{display:none!important}
