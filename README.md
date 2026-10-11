@@ -5,7 +5,8 @@ Entorno virtual de la unidad **«¿Qué hay en el aire? Explorando el comportami
 - `index.html`: portada del curso, resultados de aprendizaje y ruta de 3 semanas
 - `reto.html`: situación problema (semana 1)
 - `casos.html`: estudio de casos y prueba (semana 2)
-- `laboratorios/`: laboratorios virtuales 3D de Boyle, Avogadro, Charles y Graham, con registro
+- `laboratorios/`: laboratorios virtuales 3D (un archivo por práctica) de Boyle, Avogadro, Charles y Graham, con registro
+- `recursos/`: diapositivas de cada semana (PDF)
 - `guias/`: guías de los cuatro laboratorios virtuales
 - `evaluacion.html`: entregables y rúbricas
 - `docente.html`: panel docente (con contraseña)

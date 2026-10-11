@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seguimiento de laboratorios</title>
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}</style>
+<style>
+/* Layout: barra de filtros arriba; resumen por práctica; matriz estudiante × práctica; detalle lateral; pestañas para competencias, banco y lista */
+:root{
+  --bg:#f4f6f5; --surface:#ffffff; --surface2:#eef2f1; --line:#d9e0de; --fg:#15201e; --muted:#5b6b68; --accent:#b58900; --accent-ink:#1d1700; --acc-soft:#fff4cf;
+  --sup:#1f7a4d; --alt:#2f6fae; --bas:#9a6412; --baj:#b83227; --none:#9aa7a4; --pill-ink:#ffffff;
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1315;--surface:#141c1f;--surface2:#1b2629;--line:#2a383c;--fg:#e8eff0;--muted:#96a8ad;--accent:#ffd23f;--accent-ink:#1d1700;--acc-soft:#3a3212;--sup:#4fd18b;--alt:#6cb4ff;--bas:#ffb347;--baj:#ff7a6b;--none:#5d6d70;--pill-ink:#0d1315;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1315;--surface:#141c1f;--surface2:#1b2629;--line:#2a383c;--fg:#e8eff0;--muted:#96a8ad;--accent:#ffd23f;--accent-ink:#1d1700;--acc-soft:#3a3212;--sup:#4fd18b;--alt:#6cb4ff;--bas:#ffb347;--baj:#ff7a6b;--none:#5d6d70;--pill-ink:#0d1315;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:-.015em}
+.sub{margin:2px 0 0;color:var(--muted);font-size:14px}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+select,input,textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+textarea{width:100%;min-height:120px;font-family:var(--f-mono);font-size:13px}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-size:14px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.upd{font-size:12.5px;color:var(--muted);font-family:var(--f-mono)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{border:0;background:none;padding:9px 14px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--fg);border-bottom-color:var(--accent)}
+.banner{border:1px solid var(--line);background:var(--surface);border-left:4px solid var(--bas);border-radius:10px;padding:12px 14px;font-size:14px}
+.banner.err{border-left-color:var(--baj)}
+.sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.sum{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.sum h3{margin:0;font-family:var(--f-display);font-size:17px;display:flex;justify-content:space-between;align-items:baseline}
+.sum h3 span{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
+.funnel{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:13px}
+.funnel .bar{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden}
+.funnel .bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.funnel b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500;text-align:right}
+.avgs{display:flex;gap:14px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.avgs b{color:var(--fg);font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start}
+@media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr)}}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table.m{border-collapse:collapse;width:100%;font-size:13.5px}
+table.m th{text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+table.m td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.m td.nm{white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+table.m td.nm small{color:var(--muted);margin-left:6px;font-size:11.5px}
+.cell{display:flex;gap:4px;align-items:center;border:1px solid transparent;background:none;border-radius:8px;padding:4px 6px;min-width:118px}
+.cell:hover{border-color:var(--line);background:var(--surface2)}
+.cell.sel{border-color:var(--accent)}
+.pill{font-family:var(--f-mono);font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 6px;color:var(--pill-ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.sup{background:var(--sup)}.pill.alt{background:var(--alt)}.pill.bas{background:var(--bas)}.pill.baj{background:var(--baj)}.pill.none{background:transparent;color:var(--muted);border:1px dashed var(--none);font-weight:500}
+.st{font-size:11.5px;color:var(--muted)}
+.det{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto}
+.det h3{margin:0;font-family:var(--f-display);font-size:19px}
+.det h4{margin:6px 0 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.det ul{margin:0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:13.5px}
+.kv b{font-family:var(--f-mono);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.fbl p{margin:0 0 4px;font-size:13px;padding:6px 8px;border-radius:6px;background:var(--surface2);border-left:3px solid var(--none)}
+.fbl p.ok{border-color:var(--sup)}.fbl p.warn{border-color:var(--bas)}.fbl p.bad{border-color:var(--baj)}
+.empty{color:var(--muted);font-size:14px}
+.evgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.evcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.evrow{display:grid;grid-template-columns:44px minmax(0,1fr) 120px 52px;gap:8px;align-items:center;font-size:13px}
+.evrow .code{font-family:var(--f-mono);font-weight:700}
+.evrow .txt{color:var(--muted);font-size:12.5px;min-width:0}
+.evrow .bar{height:10px;border-radius:5px;background:var(--surface2);overflow:hidden}
+.evrow .bar i{display:block;height:100%;border-radius:5px}
+.evrow b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500;text-align:right}
+.qlist{display:flex;flex-direction:column;gap:8px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:start}
+.q.off{opacity:.55}
+.q .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.q p{margin:0;font-size:14px}
+.q .acc{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.q .rate{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.form{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.form .full{grid-column:1/-1}
+.form input,.form select,.form textarea{width:100%}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.opts label{flex-direction:row;align-items:center;gap:6px}
+.note{font-size:13px;color:var(--muted);margin:0}
+.msg{font-size:13.5px;margin:0}
+.msg.ok{color:var(--sup)}.msg.bad{color:var(--baj)}
+#login{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:flex-start;justify-content:center;padding:80px 16px 24px;overflow-y:auto}
+#login[hidden]{display:none}
+.lbox{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.lbox h2{margin:0;font-family:var(--f-display);font-size:24px}
+.lbox input{width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--muted);align-items:center}
+</style>
+<script>window.__SBKEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhYXV2dGdzZnFwbGJpZ2hhY2RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMzM4MDgsImV4cCI6MjEwNjYwOTgwOH0.CJAoAJSq8yXGW-ootxZE89-a0ZSIMb3zx16SRhZUIDQ";</script>
+</head>
+<body>
+
+
+<div id="login" hidden><form id="lForm" class="lbox"><h2>Acceso docente</h2><p class="note">Este espacio es solo para el docente. Escribe la contraseña para ver el avance de tus estudiantes.</p><label for="lPass" class="note">Contraseña</label><input id="lPass" type="password" autocomplete="current-password"><button class="btn pri" id="lGo" type="submit">Entrar</button><p class="msg bad" id="lMsg"></p><button class="btn" type="button" id="lBack" onclick="parent!==window&&parent.postMessage({lab:'index'},'*')">Volver a los laboratorios</button></form></div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Seguimiento de laboratorios</h1>
+      <p class="sub">Prácticas virtuales de gases · ingresos, ejecución y comprensión</p>
+    </div>
+    <div class="ctrl">
+      <label for="fCurso" class="note">Curso</label><select id="fCurso"><option value="">Todos</option></select>
+      <label for="fDias" class="note">Periodo</label><select id="fDias"><option value="14">Últimos 14 días</option><option value="60" selected>Últimos 60 días</option><option value="365">Último año</option></select>
+      <button class="btn" id="bBack" hidden>← Laboratorios</button><button class="btn pri" id="bLoad">Actualizar</button>
+      <span class="upd" id="upd">Sin cargar</span>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <nav class="tabs" role="tablist">
+    <button class="on" data-t="seg">Estudiantes</button>
+    <button data-t="comp">Competencias</button>
+    <button data-t="banco">Banco de preguntas</button>
+    <button data-t="lista">Lista de estudiantes</button>
+    <button data-t="cal">Cómo se califica</button>
+  </nav>
+
+  <section id="t-seg" style="display:flex;flex-direction:column;gap:14px">
+    <div class="sumgrid" id="sums"></div>
+    <div class="legend"><span>Nota de ejecución / nota de comprensión:</span><span class="pill sup">Superior</span><span class="pill alt">Alto</span><span class="pill bas">Básico</span><span class="pill baj">Bajo</span><span class="pill none">Sin dato</span></div>
+    <div class="layout">
+      <div class="tblwrap"><table class="m" id="mtx"><thead></thead><tbody></tbody></table></div>
+      <aside class="det" id="det"><p class="empty">Toca la celda de un estudiante para ver su recorrido: pasos, errores, datos del cuaderno y respuestas.</p></aside>
+    </div>
+  </section>
+
+  <section id="t-comp" hidden style="display:flex;flex-direction:column;gap:12px">
+    <p class="note">Porcentaje de respuestas correctas por evidencia ICFES, con las preguntas presentadas en el periodo y curso elegidos.</p>
+    <div class="evgrid" id="evg"></div>
+  </section>
+
+  <section id="t-banco" hidden style="display:flex;flex-direction:column;gap:12px">
+    <div class="ctrl"><label for="bLab" class="note">Práctica</label><select id="bLab"></select><span class="note" id="bCount"></span></div>
+    <div class="qlist" id="qlist"></div>
+    <h3 style="margin:8px 0 0;font-family:var(--f-display)">Agregar pregunta</h3>
+    <div class="form" id="qform">
+      <label>Práctica<select id="nLab"></select></label>
+      <label>Nivel<select id="nNivel"><option value="baja">Nivel 1 · básica</option><option value="ecuacion">Nivel 2 · uso de ecuaciones</option><option value="compleja">Nivel 3 · predicción y análisis</option></select></label>
+      <label>Evidencia ICFES<select id="nEv"><option value="2.3">2.3 · Explicación de fenómenos</option><option value="2.2">2.2 · Explicación de fenómenos</option><option value="4.7">4.7 · Uso comprensivo</option><option value="4.8">4.8 · Uso comprensivo</option><option value="7.3">7.3 · Indagación</option><option value="8.2">8.2 · Indagación</option><option value="9.3">9.3 · Indagación</option></select></label>
+      <label class="full">Enunciado<textarea id="nTxt" style="min-height:70px;font-family:var(--f-body)"></textarea></label>
+      <div class="full opts" id="nOpts"></div>
+      <label class="full">Retroalimentación (se muestra al responder)<input id="nRetro"></label>
+      <div class="full ctrl"><button class="btn pri" id="nSave">Guardar pregunta</button><span class="msg" id="nMsg"></span></div>
+    </div>
+  </section>
+
+  <section id="t-lista" hidden style="display:flex;flex-direction:column;gap:12px">
+    <p class="note">Pega tu listado desde Excel o Google Sheets con dos columnas: <b>Curso</b> y <b>Nombre</b> (una fila por estudiante). Con la lista cargada, los estudiantes eligen su nombre al entrar en vez de escribirlo.</p>
+    <textarea id="roster" placeholder="11-1	Pérez Gómez Ana María&#10;11-1	Rodríguez Díaz Juan Pablo"></textarea>
+    <div class="ctrl"><button class="btn" id="rPrev">Revisar</button><button class="btn pri" id="rSave" disabled>Cargar a la lista</button><span class="msg" id="rMsg"></span></div>
+    <div id="rPrevBox"></div>
+    <h3 style="margin:8px 0 0;font-family:var(--f-display)">En la lista</h3>
+    <div id="rList" class="note"></div>
+    <h3 style="margin:8px 0 0;font-family:var(--f-display)">Cambiar contraseña de acceso docente</h3>
+    <p class="note">Es la contraseña para abrir este tablero desde el archivo de los laboratorios.</p>
+    <div class="ctrl"><input id="kNew" type="password" placeholder="Nueva contraseña" autocomplete="new-password" aria-label="Nueva contraseña"><input id="kNew2" type="password" placeholder="Repítela" autocomplete="new-password" aria-label="Repetir contraseña"><button class="btn" id="kSave">Cambiar</button><span class="msg" id="kMsg"></span></div>
+  </section>
+
+  <section id="t-cal" hidden style="display:flex;flex-direction:column;gap:10px;max-width:72ch">
+    <p><b>Nota de ejecución (1,0 a 5,0).</b> Combina tres partes de la mejor sesión del estudiante en cada práctica: pasos de la guía completados (40 %), seguridad, que descuenta 20 % por cada error grave como manipular reactivos sin protección o no sellar (20 %), y calidad de los datos según la comprobación final del cuaderno: proporción de mensajes «bien» frente a «revisar» y «error» (40 %).</p>
+    <p><b>Nota de comprensión (1,0 a 5,0).</b> Sale de las 3 preguntas de la evaluación: 1,0 + 4 × (correctas ÷ 3). Así 3/3 = 5,0; 2/3 = 3,7; 1/3 = 2,3; 0/3 = 1,0.</p>
+    <p><b>Desempeños.</b> Bajo: menos de 3,0 · Básico: 3,0 a 3,9 · Alto: 4,0 a 4,5 · Superior: 4,6 a 5,0. Si tu institución usa otros rangos, dímelo y los ajusto.</p>
+    <p><b>Límites.</b> Las notas son un apoyo, no una calificación automática definitiva. Un estudiante puede repetir la práctica: se toma su mejor sesión y el tablero muestra cuántos intentos hizo. Los datos solo llegan desde el archivo del laboratorio con registro, nunca desde los enlaces de claude.ai.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+const PROJECT='uaauvtgsfqplbighacde',SERVER='Supabase';
+const LABS=[['boyle','Boyle'],['avogadro','Avogadro'],['charles','Charles'],['graham','Graham']];
+const LABN=Object.fromEntries(LABS);
+const NIV={baja:'Nivel 1',ecuacion:'Nivel 2',compleja:'Nivel 3'};
+const EVTXT={'2.2':'Diferencia la materia por estructura y propiedades','2.3':'Reconoce atributos de procesos fisicoquímicos (gases ideales)','4.7':'Relaciona conceptos fisicoquímicos (gases ideales) con fenómenos','4.8':'Relaciona propiedades y estructura con iones y moléculas','7.3':'Elabora conclusiones respaldadas en evidencias','8.2':'Representa datos en gráficas y tablas','9.3':'Elige y utiliza instrumentos para reunir datos'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const q=s=>"'"+String(s).replace(/'/g,"''")+"'";
+const fmt=(n,d=1)=>Number(n).toLocaleString('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d});
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();
+let mcp=null,DATA=null,SEL=null;
+
+function banner(t,kind){const b=$('#banner');if(!t){b.hidden=true;return;}b.hidden=false;b.className='banner'+(kind==='err'?' err':'');b.innerHTML=t;}
+function errText(e){const c=e&&e.code;
+  if(c==='needs_reauth')return 'Tu conexión con Supabase venció. Vuelve a conectarla en claude.ai: Configuración → Conectores.';
+  if(c==='server_not_connected'||c==='selection_required')return 'Este tablero necesita tu conector de Supabase. Agrégalo o selecciónalo en claude.ai: Configuración → Conectores.';
+  if(c==='not_in_manifest'||c==='not_granted')return 'No diste permiso a este tablero para usar Supabase. Ábrelo de nuevo y acepta el permiso.';
+  if(c==='server_unavailable')return 'Supabase no respondió. Si el proyecto estaba pausado, ábrelo en supabase.com para reactivarlo y vuelve a actualizar.';
+  if(c==='clave')return 'Contraseña incorrecta.';
+  if(c==='bloqueado')return 'Demasiados intentos fallidos. Espera 15 minutos y vuelve a intentarlo.';
+  if(c==='corta')return 'La contraseña nueva debe tener al menos 10 caracteres.';
+  if(c==='red')return 'No hay conexión con la base de datos. Revisa tu internet; si el proyecto de Supabase estaba pausado, reactívalo en supabase.com.';
+  if(c==='tool_error')return 'Supabase rechazó la consulta: '+esc(e.message||'');
+  return 'No se pudo consultar Supabase ('+esc(c||'error')+').';}
+function rows(payload){
+  if(Array.isArray(payload))return payload;
+  if(payload&&typeof payload==='object'&&Array.isArray(payload.result))return payload.result;
+  let t=typeof payload==='string'?payload:(payload&&payload.result)||'';
+  const m=t.match(/<untrusted-data-[^>]*>\s*([\s\S]*?)\s*<\/untrusted-data-[^>]*>/);if(m)t=m[1];
+  const i=t.indexOf('[');if(i<0)return [];return JSON.parse(t.slice(i,t.lastIndexOf(']')+1));}
+const SB='https://uaauvtgsfqplbighacde.supabase.co',KEY=window.__SBKEY||'';
+let API=null,CLAVE=null;
+async function rpc(fn,args){let r;try{r=await fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});}catch(e){throw{code:'red'};}
+  const t=await r.text();if(!r.ok){let m='';try{m=JSON.parse(t).message||'';}catch(e){}throw{code:m==='clave_incorrecta'?'clave':m==='acceso_bloqueado'?'bloqueado':m==='clave_corta'?'corta':'red',message:m||('HTTP '+r.status)};}return t?JSON.parse(t):null;}
+async function rpcD(fn,args){const r=await rpc(fn,Object.assign({p_clave:CLAVE},args));if(r&&r.error){const m=r.error;throw{code:m==='clave_incorrecta'?'clave':m==='acceso_bloqueado'?'bloqueado':m==='clave_corta'?'corta':'tool_error',message:m};}return r;}
+const restApi={panel:d=>rpcD('docente_panel',{p_dias:d}),activa:(c,a)=>rpcD('docente_activa2',{p_codigo:c,p_activa:a}),
+  agregar:o=>rpcD('docente_agregar2',{p_codigo:o.codigo,p_lab:o.lab,p_nivel:o.nivel,p_ev:o.ev,p_enunciado:o.txt,p_opciones:o.ops,p_correcta:o.cor,p_retro:o.ret}),
+  lista:async rows=>{const r=await rpcD('docente_lista2',{p_filas:rows});return r.n;},clave:n=>rpcD('docente_clave2',{p_nueva:n})};
+const mcpApi={
+  panel:async d=>{const r=await sql('select public.panel(now() - interval '+q(d+' days')+') as d');let x=r[0]&&r[0].d;return typeof x==='string'?JSON.parse(x):x;},
+  activa:(c,a)=>sql('update public.preguntas set activa = '+(a?'true':'false')+' where codigo = '+q(c)+' returning codigo'),
+  agregar:o=>sql('insert into public.preguntas (codigo,lab,nivel,competencia,aprendizaje,evidencia,enunciado,opciones,correcta,retro) select '+q(o.codigo)+','+q(o.lab)+','+q(o.nivel)+',m.competencia,m.aprendizaje,m.evidencia,'+q(o.txt)+','+q(JSON.stringify(o.ops))+'::jsonb,'+o.cor+','+q(o.ret)+' from public.matriz_icfes m where m.evidencia_codigo = '+q(o.ev)+' returning codigo'),
+  lista:async rows=>{const vals=rows.map(r=>'('+q(r.curso)+','+q(r.nombre)+','+q(r.nombre)+')').join(',');const r=await sql('with ins as (insert into public.estudiantes (curso,nombre,etiqueta) values '+vals+' on conflict (curso,nombre) do nothing returning 1) select count(*) as n from ins');return r[0]?r[0].n:0;},
+  clave:async n=>{await sql('update public.config_docente set hash = extensions.crypt('+q(n)+', extensions.gen_salt('+q('bf')+', 10)), actualizado = now() where id = 1 returning id');}};
+async function sql(query){if(!mcp)throw{code:'not_granted'};const r=await mcp.callTool(SERVER,'execute_sql',{project_id:PROJECT,query},{cache:false});return rows(r.payload!==undefined?r.payload:(r.content&&r.content[0]&&r.content[0].text));}
+
+/* ---------- notas ---------- */
+function nivel(n){if(n==null)return['none','—'];return n>=4.6?['sup',fmt(n)]:n>=4?['alt',fmt(n)]:n>=3?['bas',fmt(n)]:['baj',fmt(n)];}
+function ejec(s){const p=s.pasos_total?Math.min(1,(s.pasos||0)/s.pasos_total):0;const seg=Math.max(0,1-.2*(s.av_bad||0));const fb=s.retro||[];const tot=fb.length;const cal=tot?fb.filter(f=>f.k==='ok').length/tot:0;
+  if(!s.pasos&&!s.comprobaciones)return null;return 1+4*(.4*p+.2*seg+.4*cal);}
+function compr(s){const r=s.respuestas||[];if(r.length<3)return null;return 1+4*(r.filter(x=>x.ok).length/3);}
+function estado(s){if((s.respuestas||[]).length>=3)return'Evaluado';if(s.comprobaciones)return'Comprobó';return'En curso';}
+
+/* ---------- carga ---------- */
+async function load(){
+  const b=$('#bLoad');b.disabled=true;$('#upd').textContent='Consultando…';
+  try{const dias=+$('#fDias').value;DATA=await API.panel(dias);banner(null);
+    $('#upd').textContent='Actualizado '+new Date(DATA.generado).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    fillCursos();render();}
+  catch(e){banner(errText(e),'err');$('#upd').textContent='Sin datos';}
+  finally{b.disabled=false;}
+}
+function fillCursos(){const sel=$('#fCurso'),cur=sel.value;const cs=new Set();DATA.estudiantes.forEach(e=>cs.add(e.curso));DATA.sesiones.forEach(s=>s.curso&&cs.add(s.curso));
+  sel.innerHTML='<option value="">Todos</option>'+[...cs].sort().map(c=>'<option'+(c===cur?' selected':'')+'>'+esc(c)+'</option>').join('');}
+function people(){
+  const curso=$('#fCurso').value;const map=new Map();
+  DATA.estudiantes.forEach(e=>{if(curso&&e.curso!==curso)return;map.set('L|'+e.curso+'|'+norm(e.nombre),{nombre:e.nombre,curso:e.curso,lista:true,labs:{}});});
+  DATA.sesiones.forEach(s=>{if(curso&&s.curso!==curso)return;const k='L|'+s.curso+'|'+norm(s.nombre);let p=map.get(k);if(!p){p={nombre:s.nombre,curso:s.curso,lista:false,labs:{}};map.set(k,p);}
+    (p.labs[s.lab]=p.labs[s.lab]||[]).push(s);});
+  const arr=[...map.values()];arr.forEach(p=>{p.best={};LABS.forEach(([k])=>{const ss=p.labs[k]||[];if(!ss.length)return;
+    ss.forEach(s=>{s._e=ejec(s);s._c=compr(s);});const b=ss.slice().sort((a,b)=>((b._e||0)+(b._c||0))-((a._e||0)+(a._c||0)))[0];p.best[k]={s:b,n:ss.length,e:Math.max(...ss.map(x=>x._e||0))||null,c:Math.max(...ss.map(x=>x._c||0))||null};});});
+  return arr.sort((a,b)=>a.curso.localeCompare(b.curso)||a.nombre.localeCompare(b.nombre,'es'));
+}
+function render(){if(!DATA)return;renderSums();renderMatrix();renderComp();renderBank();renderRoster();}
+function renderSums(){
+  const P=people(),N=P.filter(p=>p.lista).length;
+  $('#sums').innerHTML=LABS.map(([k,n])=>{
+    const ent=P.filter(p=>p.best[k]).length,comp=P.filter(p=>p.best[k]&&p.best[k].s.comprobaciones).length,ev=P.filter(p=>p.best[k]&&p.best[k].c).length;
+    const es=P.map(p=>p.best[k]&&p.best[k].e).filter(Boolean),cs=P.map(p=>p.best[k]&&p.best[k].c).filter(Boolean);
+    const base=Math.max(N,ent,1);const row=(l,v)=>'<span>'+l+'</span><span class="bar"><i style="width:'+Math.round(v/base*100)+'%"></i></span><b>'+v+'</b>';
+    return '<div class="sum"><h3>'+n+'<span>'+(N?N+' en lista':'sin lista cargada')+'</span></h3><div class="funnel">'+row('Entraron',ent)+row('Comprobaron',comp)+row('Evaluados',ev)+'</div>'+
+      '<div class="avgs"><span>Ejecución <b>'+(es.length?fmt(es.reduce((a,b)=>a+b,0)/es.length):'—')+'</b></span><span>Comprensión <b>'+(cs.length?fmt(cs.reduce((a,b)=>a+b,0)/cs.length):'—')+'</b></span></div></div>';}).join('');
+}
+function renderMatrix(){
+  const P=people(),t=$('#mtx');
+  t.querySelector('thead').innerHTML='<tr><th>Estudiante</th>'+LABS.map(([k,n])=>'<th>'+n+'</th>').join('')+'</tr>';
+  if(!P.length){t.querySelector('tbody').innerHTML='<tr><td colspan="5" class="empty">Todavía no hay estudiantes ni sesiones en este periodo. Carga la lista en la pestaña «Lista de estudiantes» o espera a que entren al laboratorio.</td></tr>';return;}
+  t.querySelector('tbody').innerHTML=P.map((p,i)=>'<tr><td class="nm" title="'+esc(p.nombre)+'">'+esc(p.nombre)+'<small>'+esc(p.curso)+(p.lista?'':' · fuera de lista')+'</small></td>'+LABS.map(([k])=>{const b=p.best[k];
+    if(!b)return'<td><span class="st">No ha entrado</span></td>';const e=nivel(b.e),c=nivel(b.c);
+    return'<td><button class="cell" data-p="'+i+'" data-l="'+k+'" aria-label="Detalle '+esc(p.nombre)+' '+esc(LABN[k])+'"><span class="pill '+e[0]+'" title="Ejecución">'+e[1]+'</span><span class="pill '+c[0]+'" title="Comprensión">'+c[1]+'</span><span class="st">'+estado(b.s)+(b.n>1?' · '+b.n+' intentos':'')+'</span></button></td>';}).join('')+'</tr>').join('');
+  t.querySelectorAll('.cell').forEach(c=>c.onclick=()=>{t.querySelectorAll('.cell').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');detail(P[+c.dataset.p],c.dataset.l);});
+}
+function detail(p,lab){
+  const b=p.best[lab],s=b.s,min=s.ultimo?Math.round((new Date(s.ultimo)-new Date(s.inicio))/60000):0;
+  const e=nivel(b.e),c=nivel(b.c);const nb=s.cuaderno||{};
+  const kv=o=>Object.keys(o||{}).map(k=>'<span>'+esc(k)+'</span><b>'+esc(o[k])+'</b>').join('');
+  $('#det').innerHTML='<h3>'+esc(p.nombre)+'</h3><p class="note">'+esc(p.curso)+' · '+esc(LABN[lab])+' · '+new Date(s.inicio).toLocaleString('es-CO',{dateStyle:'medium',timeStyle:'short'})+' · '+min+' min · '+esc(s.origen)+'</p>'+
+   '<div class="kv"><span>Ejecución</span><b><span class="pill '+e[0]+'">'+e[1]+'</span></b><span>Comprensión</span><b><span class="pill '+c[0]+'">'+c[1]+'</span></b><span>Pasos de la guía</span><b>'+(s.pasos||0)+' / '+(s.pasos_total||'—')+'</b><span>Intentos fallidos de materiales</span><b>'+(s.mat_fallos||0)+'</b><span>Errores graves</span><b>'+(s.av_bad||0)+'</b><span>Advertencias</span><b>'+(s.av_warn||0)+'</b><span>Comprobaciones</span><b>'+(s.comprobaciones||0)+'</b><span>Intentos de la práctica</span><b>'+b.n+'</b></div>'+
+   (s.av_bad_txt&&s.av_bad_txt.length?'<h4>Errores graves</h4><ul>'+s.av_bad_txt.slice(0,8).map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+
+   '<h4>Última comprobación</h4><div class="fbl">'+((s.retro||[]).map(f=>'<p class="'+esc(f.k)+'">'+esc(f.t)+'</p>').join('')||'<p>Sin comprobar.</p>')+'</div>'+
+   '<h4>Datos del cuaderno</h4><div class="kv">'+(kv(nb.campos)+kv(nb.resultados)||'<span class="empty">Sin datos</span>')+'</div>'+
+   '<h4>Evaluación</h4>'+((s.respuestas||[]).length?'<div class="kv">'+s.respuestas.map(r=>'<span>'+NIV[r.nivel]+' · '+esc(r.ev)+' <small class="note">'+esc(r.codigo)+'</small></span><b>'+(r.ok?'Correcta':'Incorrecta')+(r.seg?' · '+r.seg+' s':'')+'</b>').join('')+'</div>':'<p class="empty">No ha presentado la evaluación.</p>');
+}
+function renderComp(){
+  const curso=$('#fCurso').value;const by={};
+  DATA.sesiones.forEach(s=>{if(curso&&s.curso!==curso)return;(s.respuestas||[]).forEach(r=>{const k=s.lab+'|'+r.ev;by[k]=by[k]||{n:0,c:0};by[k].n++;if(r.ok)by[k].c++;});});
+  $('#evg').innerHTML=LABS.map(([k,n])=>{const evs=Object.keys(by).filter(x=>x.startsWith(k+'|')).map(x=>x.split('|')[1]).sort();
+    return'<div class="evcard"><h3 style="margin:0;font-family:var(--f-display)">'+n+'</h3>'+(evs.length?evs.map(ev=>{const d=by[k+'|'+ev],pct=Math.round(d.c/d.n*100),col=pct>=80?'var(--sup)':pct>=60?'var(--alt)':pct>=40?'var(--bas)':'var(--baj)';
+      return'<div class="evrow"><span class="code">'+esc(ev)+'</span><span class="txt">'+esc(EVTXT[ev]||'')+'</span><span class="bar"><i style="width:'+pct+'%;background:'+col+'"></i></span><b>'+pct+' %</b></div><div class="note" style="margin:-6px 0 0 52px">'+d.c+' de '+d.n+' respuestas</div>';}).join(''):'<p class="empty">Sin respuestas todavía.</p>')+'</div>';}).join('');
+}
+function renderBank(){
+  const sl=$('#bLab');if(!sl.options.length){sl.innerHTML=LABS.map(([k,n])=>'<option value="'+k+'">'+n+'</option>').join('');$('#nLab').innerHTML=sl.innerHTML;sl.onchange=renderBank;}
+  const lab=sl.value,qs=DATA.preguntas.filter(p=>p.lab===lab);const st={};
+  DATA.sesiones.forEach(s=>(s.respuestas||[]).forEach(r=>{st[r.codigo]=st[r.codigo]||{n:0,c:0};st[r.codigo].n++;if(r.ok)st[r.codigo].c++;}));
+  $('#bCount').textContent=qs.filter(p=>p.activa).length+' activas de '+qs.length+' · a cada estudiante le salen 3 (una por nivel)';
+  $('#qlist').innerHTML=qs.map(p=>{const s=st[p.codigo];return'<div class="q'+(p.activa?'':' off')+'"><div><div class="meta">'+esc(p.codigo)+' · '+NIV[p.nivel]+' · '+esc(p.ev)+' '+esc(p.comp)+'</div><p>'+esc(p.enunciado)+'</p></div><div class="acc"><span class="rate">'+(s?Math.round(s.c/s.n*100)+' % correctas ('+s.n+')':'sin respuestas')+'</span><button class="btn" data-c="'+esc(p.codigo)+'" data-a="'+(p.activa?1:0)+'">'+(p.activa?'Desactivar':'Activar')+'</button></div></div>';}).join('');
+  $('#qlist').querySelectorAll('button[data-c]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await API.activa(b.dataset.c,b.dataset.a!=='1');await load();}catch(e){banner(errText(e),'err');b.disabled=false;}});
+}
+function buildOpts(){$('#nOpts').innerHTML=[0,1,2,3].map(i=>'<label><input type="radio" name="nCor" value="'+i+'"'+(i===0?' checked':'')+' aria-label="Marcar opción '+'ABCD'[i]+' como correcta"><span style="font-family:var(--f-mono)">'+'ABCD'[i]+'</span><input id="nO'+i+'" placeholder="Opción '+'ABCD'[i]+'"></label>').join('');}
+$('#nSave').onclick=async()=>{
+  const lab=$('#nLab').value,niv=$('#nNivel').value,ev=$('#nEv').value,txt=$('#nTxt').value.trim(),ops=[0,1,2,3].map(i=>$('#nO'+i).value.trim()),cor=+document.querySelector('input[name=nCor]:checked').value,ret=$('#nRetro').value.trim();
+  const m=$('#nMsg');if(!txt||ops.some(o=>!o)||!ret){m.className='msg bad';m.textContent='Completa el enunciado, las cuatro opciones y la retroalimentación.';return;}
+  if(!DATA){m.className='msg bad';m.textContent='Primero pulsa Actualizar.';return;}
+  const nums=DATA.preguntas.filter(p=>p.lab===lab&&p.nivel===niv).map(p=>+p.codigo.split('-').pop()).filter(n=>!isNaN(n));const code=lab+'-'+niv+'-'+((nums.length?Math.max(...nums):0)+1);
+  $('#nSave').disabled=true;
+  try{await API.agregar({codigo:code,lab,nivel:niv,ev,txt,ops,cor,ret});
+    m.className='msg ok';m.textContent='Pregunta '+code+' guardada. Ya puede salir en el sorteo.';['nTxt','nRetro','nO0','nO1','nO2','nO3'].forEach(id=>$('#'+id).value='');await load();}
+  catch(e){m.className='msg bad';m.innerHTML=errText(e);}finally{$('#nSave').disabled=false;}
+};
+let ROS=[];
+$('#rPrev').onclick=()=>{
+  const lines=$('#roster').value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);ROS=[];const bad=[];
+  lines.forEach((l,i)=>{const p=l.split(/\t|;|,(?=\s*\S)/).map(x=>x.trim()).filter(Boolean);if(p.length<2){bad.push(i+1);return;}const c=p[0],n=p.slice(1).join(' ').replace(/\s+/g,' ');
+    if(/^curso$/i.test(c))return;ROS.push({curso:c,nombre:n});});
+  const cs={};ROS.forEach(r=>cs[r.curso]=(cs[r.curso]||0)+1);
+  $('#rPrevBox').innerHTML='<p class="note">'+ROS.length+' estudiantes: '+Object.keys(cs).map(c=>esc(c)+' ('+cs[c]+')').join(', ')+(bad.length?'. Filas sin curso o nombre: '+bad.slice(0,10).join(', '):'')+'</p>';
+  $('#rSave').disabled=!ROS.length;
+};
+$('#rSave').onclick=async()=>{
+  const m=$('#rMsg');$('#rSave').disabled=true;
+  try{const n=await API.lista(ROS);
+    m.className='msg ok';m.textContent=n+' estudiantes nuevos cargados.';$('#roster').value='';$('#rPrevBox').innerHTML='';ROS=[];await load();}
+  catch(e){m.className='msg bad';m.innerHTML=errText(e);$('#rSave').disabled=false;}
+};
+function renderRoster(){const cs={};DATA.estudiantes.forEach(e=>(cs[e.curso]=cs[e.curso]||[]).push(e.nombre));
+  $('#rList').innerHTML=Object.keys(cs).length?Object.keys(cs).sort().map(c=>'<p><b>'+esc(c)+'</b> · '+cs[c].length+' estudiantes</p>').join(''):'Todavía no hay estudiantes cargados. Mientras tanto, los estudiantes escriben su nombre y curso al entrar.';}
+
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));['seg','comp','banco','lista','cal'].forEach(t=>$('#t-'+t).hidden=b.dataset.t!==t);});
+$('#fCurso').onchange=render;$('#fDias').onchange=load;$('#bLoad').onclick=load;
+buildOpts();
+$('#kSave').onclick=async()=>{const a=$('#kNew').value,b=$('#kNew2').value,m=$('#kMsg');
+  if(a.length<10){m.className='msg bad';m.textContent='Usa al menos 10 caracteres.';return;}if(a!==b){m.className='msg bad';m.textContent='Las dos contraseñas no coinciden.';return;}
+  try{await API.clave(a);if(API===restApi)CLAVE=a;m.className='msg ok';m.textContent='Contraseña cambiada. Úsala la próxima vez que entres.';$('#kNew').value=$('#kNew2').value='';}catch(e){m.className='msg bad';m.innerHTML=errText(e);}};
+if(window.name==='labhub'){const bk=$('#bBack');bk.hidden=false;bk.onclick=()=>parent.postMessage({lab:'index'},'*');}
+function showLogin(){const L=$('#login');L.hidden=false;setTimeout(()=>$('#lPass').focus(),50);
+  $('#lForm').onsubmit=async e=>{e.preventDefault();const pw=$('#lPass').value;if(!pw)return;$('#lGo').disabled=true;$('#lMsg').textContent='Verificando…';
+    CLAVE=pw;API=restApi;try{const dias=+$('#fDias').value;DATA=await API.panel(dias);L.hidden=true;$('#lPass').value='';$('#upd').textContent='Actualizado '+new Date(DATA.generado).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});fillCursos();render();}
+    catch(err){CLAVE=null;$('#lMsg').innerHTML=errText(err);}finally{$('#lGo').disabled=false;}};}
+(async()=>{
+  if(KEY){$('#bLoad').disabled=false;showLogin();return;}
+  try{mcp=window.claude&&window.claude.use?await window.claude.use('mcp'):null;}catch(e){mcp=null;}
+  if(!mcp){banner('Este tablero lee tus datos con tu conector de Supabase y solo funciona abierto en claude.ai, con tu cuenta. Si lo abriste desde otro lugar, ábrelo desde tu galería de artefactos.','err');$('#bLoad').disabled=true;return;}
+  API=mcpApi;load();
+})();
+})();
+</script>
+
+</body>
+</html>

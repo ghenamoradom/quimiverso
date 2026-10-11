@@ -4,12 +4,13 @@
   Deja "" (comillas vacías) en lo que aún no tengas: el sitio mostrará "Disponible pronto".
 */
 window.CURSO = {
-  // Diapositivas de las clases magistrales (Drive, Canva, Google Slides, etc.)
-  // (#page=N abre el PDF en esa diapositiva)
-  diapositivas: "recursos/clase-gases.pdf",                    // Presentación completa de la unidad
-  diapositivas1: "recursos/clase-gases.pdf#page=2",            // Semana 1 · gas ideal, Boyle y Charles
-  diapositivas2: "recursos/clase-gases.pdf#page=10",           // Semana 2 · Gay-Lussac, Avogadro y PV = nRT
-  diapositivasDaltonGraham: "recursos/clase-gases.pdf#page=13", // Semana 3 · Dalton y Graham
+  // Diapositivas de cada semana (PDF en la carpeta recursos/)
+  diapositivas1: "recursos/semana-1-boyle-charles.pdf",          // Semana 1 · gas ideal, presión, Boyle y Charles
+  diapositivas2: "recursos/semana-2-gay-lussac-avogadro.pdf",    // Semana 2 · Gay-Lussac, Avogadro, combinada y PV = nRT
+  diapositivasDaltonGraham: "recursos/semana-3-dalton-graham.pdf", // Semana 3 · Dalton y Graham
+
+  // Cursos que aparecen al identificarse
+  cursos: ["10-1", "10-2", "10-3", "10-V", "11-1", "11-2", "11-V"],
 
   // Carpeta de Drive donde los estudiantes leen la realimentación
   carpetaDrive: "https://drive.google.com/drive/folders/1SKV59I5IHOKuDHUGLpGVUiqklnBJVI5n?usp=drive_link",
