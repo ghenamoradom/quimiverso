@@ -14,8 +14,8 @@ main{max-width:780px}
 .intro{padding:32px 0 8px;display:flex;flex-direction:column;gap:12px}
 .intro h1{font-size:clamp(30px,5vw,44px)}
 .intro .lead{color:var(--muted);font-size:17px}
-.ilus{margin:14px 0 0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff}
-.ilus img{display:block;width:100%;height:auto}
+.ilus{margin:14px 0 0;display:flex;justify-content:center}
+.ilus img{display:block;width:auto;max-width:100%;height:auto;max-height:min(46vh,420px);border:1px solid var(--line);border-radius:var(--r);background:#fff}
 .prog{position:sticky;top:58px;z-index:10;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--muted)}
 .prog .bar{flex:1;height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
 .prog .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
