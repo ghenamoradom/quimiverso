@@ -29,7 +29,8 @@ main{max-width:820px}
 .ctx dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:15px;background:var(--panel2);border-radius:10px;padding:12px 14px}
 .ctx dt{color:var(--muted)}
 .ctx dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.ctx svg{width:100%;height:auto;margin-top:12px}
+.ilus{margin:0;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.ilus img{display:block;width:100%;height:auto}
 @media (max-width:640px){.ctx{grid-template-columns:1fr}}
 .q{display:flex;flex-direction:column;gap:10px}
 .q .qh{display:flex;gap:10px;align-items:baseline}
@@ -90,7 +91,7 @@ const CASES = [
  { id:'olla', titulo:'La olla a presión', law:'Gay-Lussac · P/T = k',
    story:'Doña Marta cocina fríjoles en una olla a presión. Al cerrar la tapa, el aire atrapado está a temperatura ambiente. Con el fogón encendido, el gas de adentro llega a 120 °C y la válvula empieza a silbar. Para el modelo, ten en cuenta solo el aire atrapado, sin el vapor de agua.',
    datos:[['Presión inicial','1,00 atm'],['Temperatura inicial','25 °C'],['Temperatura final','120 °C'],['Volumen','constante']],
-   svg:'<svg viewBox="0 0 220 120" aria-hidden="true"><rect x="40" y="40" width="140" height="70" rx="10" fill="#eef2f4" stroke="#a9b6bd" stroke-width="2"/><rect x="30" y="30" width="160" height="14" rx="5" fill="#d5dde1"/><rect x="104" y="12" width="12" height="20" rx="3" fill="#ffd23f"/><g fill="#ff8a6b"><circle cx="70" cy="70" r="5"/><circle cx="100" cy="88" r="5"/><circle cx="135" cy="64" r="5"/><circle cx="160" cy="92" r="5"/><circle cx="118" cy="78" r="5"/></g><path d="M60 116c6-6 6-10 0-16M110 116c6-6 6-10 0-16M160 116c6-6 6-10 0-16" stroke="#ff8a6b" stroke-width="2" fill="none" opacity=".7"/></svg>',
+   img:'assets/img/casos/olla.jpg', alt:'Ilustración: olla a presión con el aire atrapado; a 25 °C y 1 atm, y calentada a 120 °C con el manómetro marcando una presión desconocida.',
    preguntas:[
      { tipo:'radio', id:'olla_const', tag:'Comprender', txt:'¿Qué permanece constante mientras se calienta la olla?', ops:[['vn','El volumen y la cantidad de gas'],['p','La presión'],['t','La temperatura'],['todo','Nada cambia, porque la olla está cerrada']],
        fb:v => v === 'vn' ? ['ok','Correcto: la olla es rígida y está sellada. Cambian la temperatura y la presión.'] : ['warn','Piensa: ¿puede la olla crecer? ¿entra o sale aire con la tapa cerrada? ¿qué hace el fogón?'] },
@@ -101,7 +102,7 @@ const CASES = [
  { id:'llanta', titulo:'Las llantas en verano', law:'Gay-Lussac · P/T = k',
    story:'Carlos calibra las llantas de su carro a 32 psi a las 6 de la mañana, con el aire de la llanta a 20 °C. Viaja por una carretera caliente de la costa y al mediodía el aire de la llanta llega a 55 °C. Un amigo le dice que saque aire porque "las llantas están muy infladas".',
    datos:[['Presión inicial','32 psi'],['Temperatura inicial','20 °C'],['Temperatura al mediodía','55 °C'],['Volumen','casi constante']],
-   svg:'<svg viewBox="0 0 220 120" aria-hidden="true"><circle cx="110" cy="62" r="50" fill="#eef2f4" stroke="#a9b6bd" stroke-width="12"/><circle cx="110" cy="62" r="18" fill="#d5dde1"/><g fill="#6cc4ff"><circle cx="80" cy="40" r="4"/><circle cx="140" cy="44" r="4"/><circle cx="76" cy="80" r="4"/><circle cx="145" cy="84" r="4"/><circle cx="110" cy="96" r="4"/><circle cx="110" cy="28" r="4"/></g><circle cx="190" cy="20" r="12" fill="#ffd23f"/></svg>',
+   img:'assets/img/casos/llanta.jpg', alt:'Ilustración: la llanta de Carlos a las 6 a. m. (20 °C, 32 psi) y al mediodía (55 °C), con la presión final por calcular.',
    preguntas:[
      { tipo:'num', id:'llanta_p', tag:'Modelar', txt:'¿Cuál es la presión de la llanta al mediodía?', unidad:'psi',
        fb:x => near(x, P_LL, .02) ? ['ok','<b>Correcto.</b> P₂ = 32 psi × 328,15 K / 293,15 K ≈ ' + fmt(P_LL, 1) + ' psi.'] : near(x, 88, .03) ? ['bad','<b>Usaste grados Celsius.</b> 32 × 55/20 = 88 psi reventaría la llanta. Convierte a kelvin.'] : ['warn','<b>Todavía no.</b> Usa P₁/T₁ = P₂/T₂ con temperaturas en kelvin.'] },
@@ -112,7 +113,7 @@ const CASES = [
  { id:'airbag', titulo:'El airbag', law:'Avogadro y gas ideal · PV = nRT',
    story:'En un choque, un sensor activa la descomposición de azida de sodio, que produce nitrógeno gaseoso en unos 30 milisegundos: 2 NaN₃(s) → 2 Na(s) + 3 N₂(g). La bolsa debe quedar llena de N₂ a la presión y temperatura indicadas.',
    datos:[['Volumen de la bolsa','60,0 L'],['Presión del N₂','1,10 atm'],['Temperatura','27 °C'],['Masa molar NaN₃','65,01 g/mol']],
-   svg:'<svg viewBox="0 0 220 120" aria-hidden="true"><rect x="20" y="70" width="60" height="40" rx="6" fill="#d5dde1"/><ellipse cx="135" cy="60" rx="70" ry="46" fill="#eef2f4" stroke="#a9b6bd" stroke-width="2"/><g fill="#7ee0a8"><circle cx="100" cy="50" r="4"/><circle cx="120" cy="75" r="4"/><circle cx="150" cy="40" r="4"/><circle cx="170" cy="70" r="4"/><circle cx="135" cy="58" r="4"/><circle cx="185" cy="52" r="4"/><circle cx="110" cy="30" r="4"/><circle cx="155" cy="90" r="4"/></g><path d="M80 88 L70 70" stroke="#a9b6bd" stroke-width="6"/></svg>',
+   img:'assets/img/casos/airbag.jpg', alt:'Ilustración: el sensor activa la azida de sodio, que se descompone y llena la bolsa de nitrógeno gaseoso.',
    preguntas:[
      { tipo:'num', id:'airbag_n', tag:'Modelar', txt:'¿Cuántos moles de N₂ hay en la bolsa inflada?', unidad:'mol',
        fb:x => near(x, N_AB, .02) ? ['ok','<b>Correcto.</b> n = PV/(RT) = (1,10 × 60,0) / (0,082 × 300,15) ≈ ' + fmt(N_AB) + ' mol.'] : near(x, 29.8, .03) ? ['bad','<b>Usaste grados Celsius.</b> 27 °C = 300,15 K.'] : near(x, .373, .04) ? ['bad','<b>Invertiste la fórmula.</b> Despeja n = PV/(RT).'] : ['warn','<b>Todavía no.</b> Despeja n de PV = nRT y usa la temperatura en kelvin.'] },
@@ -130,7 +131,7 @@ function tabs(){
 }
 function render(){
   $('#cases').innerHTML = CASES.map((c, i) => '<section class="case" id="c-' + c.id + '" role="tabpanel" aria-labelledby="t-' + c.id + '" hidden>' +
-    '<div class="card ctx"><div><p class="eyebrow">Caso ' + (i + 1) + '</p><h2>' + esc(c.titulo) + '</h2><p class="law">' + esc(c.law) + '</p><p class="story">' + esc(c.story) + '</p></div><div><dl>' + c.datos.map(d => '<dt>' + esc(d[0]) + '</dt><dd>' + esc(d[1]) + '</dd>').join('') + '</dl>' + c.svg + '</div></div>' +
+    '<div class="card ctx"><div><p class="eyebrow">Caso ' + (i + 1) + '</p><h2>' + esc(c.titulo) + '</h2><p class="law">' + esc(c.law) + '</p><p class="story">' + esc(c.story) + '</p></div><div><dl>' + c.datos.map(d => '<dt>' + esc(d[0]) + '</dt><dd>' + esc(d[1]) + '</dd>').join('') + '</dl></div></div>' + '<figure class="ilus"><img src="' + c.img + '" alt="' + esc(c.alt) + '" width="1626" height="656" loading="lazy"></figure>' +
     c.preguntas.map(q => '<div class="card q"><div class="qh"><span class="tag">' + q.tag + '</span><h3>' + esc(q.txt) + '</h3></div>' +
       (q.tipo === 'radio' ? '<div class="opts">' + q.ops.map(o => '<label class="opt"><input type="radio" name="' + q.id + '" value="' + o[0] + '">' + esc(o[1]) + '</label>').join('') + '</div>'
        : q.tipo === 'num' ? '<div class="calc"><span class="unit"><input name="' + q.id + '" inputmode="decimal" autocomplete="off" placeholder="0,00" aria-label="Respuesta en ' + q.unidad + '"><span>' + q.unidad + '</span></span><button type="button" class="btn" data-check="' + q.id + '">Comprobar</button></div>'

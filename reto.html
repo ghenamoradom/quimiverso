@@ -14,6 +14,8 @@ main{max-width:780px}
 .intro{padding:32px 0 8px;display:flex;flex-direction:column;gap:12px}
 .intro h1{font-size:clamp(30px,5vw,44px)}
 .intro .lead{color:var(--muted);font-size:17px}
+.ilus{margin:14px 0 0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff}
+.ilus img{display:block;width:100%;height:auto}
 .prog{position:sticky;top:58px;z-index:10;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--muted)}
 .prog .bar{flex:1;height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
 .prog .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
@@ -60,6 +62,7 @@ main{max-width:780px}
     <p class="lead">Una familia sale en bus desde Cartagena hacia un páramo de la cordillera, a más de 3 000 metros de altura. En la maleta llevan un paquete sellado de papas fritas. La empresa que los fabrica recibe quejas: algunos paquetes llegan reventados a la montaña y otros no. Tu misión es averiguar por qué y proponer una solución.</p>
   </section>
 
+  <figure class="ilus"><img src="assets/img/casos/paramo.jpg" alt="Ilustración: en Cartagena, a 30 °C y 1,00 atm, un paquete de papas sellado con 400 mL de aire va en la maleta del bus hacia el páramo." width="782" height="280"></figure>
   <div class="prog" aria-live="polite"><span id="progTxt">0 de 8 pasos</span><span class="bar"><i id="progBar"></i></span><span class="save" id="saveTxt">Sin guardar</span></div>
 
   <section class="story" style="margin-top:18px">
