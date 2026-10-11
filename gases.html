@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>El mundo de los gases · Quimiverso</title>
+<meta name="description" content="Entorno virtual de la unidad de leyes de los gases · Química General, grado décimo, IE Juan XXIII.">
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Portada: héroe; ruta por semanas con pestañas; laboratorios; evaluación */
+.hero{padding:56px 0 24px;max-width:760px}
+.hero h1{font-size:clamp(34px,6vw,60px);font-weight:700;letter-spacing:-.025em;margin-top:10px;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--c1)}
+.hero .lead{margin-top:14px;font-size:18px;color:var(--muted);max-width:56ch}
+.hero .meta{margin-top:18px}
+.hero .btnrow{margin-top:22px}
+section.blk{padding:40px 0 8px}
+.shead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:18px}
+.shead h2{font-size:clamp(26px,3.6vw,34px)}
+.shead p{color:var(--muted);max-width:60ch}
+
+.ra-gen{border-left:4px solid var(--accent);background:var(--panel);border-radius:0 var(--r) var(--r) 0;padding:18px 20px;font-size:18px;line-height:1.5}
+.ra-gen .eyebrow{display:block;margin-bottom:6px}
+.ra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;margin-top:12px}
+.ra{display:flex;flex-direction:column;gap:10px}
+.ra .n{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
+.ra p{font-size:15px}
+.ra .inst{margin-top:auto;font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+
+.wtabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.wtab{flex:1 0 220px;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:12px;padding:12px 14px;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:2px}
+.wtab .eyebrow{font-size:11.5px}
+.wtab b{font-family:var(--f-display);font-size:17px}
+.wtab span.t{font-size:13.5px;color:var(--muted)}
+.wtab[aria-selected=true]{border-color:var(--accent);background:var(--acc-soft)}
+.wtab[aria-selected=true] .eyebrow{color:var(--accent)}
+.week{margin-top:18px;display:flex;flex-direction:column;gap:22px}
+.week[hidden]{display:none}
+.wintro{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;color:var(--muted);font-size:15px}
+.sess h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+.sess h3 span{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;text-transform:none}
+.moms{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:12px}
+.mom{display:flex;flex-direction:column;gap:12px;position:relative}
+.mom .mh{display:flex;gap:12px;align-items:flex-start}
+.mom .k{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;background:var(--panel2);border:1px solid var(--line2);color:var(--accent)}
+.mom h4{font-size:19px}
+.mom .strat{font-size:13px;color:var(--c1);margin-top:2px}
+.mom p.do{font-size:15px}
+.mom .ent{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
+.mom .ent b{color:var(--fg)}
+.mom.lab{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px 22px;border-color:var(--line2)}
+.mom.lab .side{display:flex;flex-direction:column;gap:10px}
+.mom.lab h5{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0}
+.mom.lab ul{margin:0;padding-left:18px;font-size:14.5px}
+.warn{font-size:13.5px;border-left:3px solid var(--warn);padding:6px 10px;background:var(--panel2);border-radius:0 8px 8px 0}
+@media (max-width:760px){.mom.lab{grid-template-columns:1fr}}
+
+.labs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.labc{display:flex;flex-direction:column;gap:8px}
+.labc .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.labc h3{font-size:24px}
+.labc .law{font-family:var(--f-mono);font-size:13.5px;color:var(--c1);white-space:nowrap}
+.labc p{font-size:14.5px;color:var(--muted)}
+.labc .wk{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+
+.ev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.ev ul{margin:8px 0 0;padding-left:18px;font-size:15px}
+.ev h3{font-size:19px}
+.lvl{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.lvl div{border-left:3px solid var(--c1);padding-left:10px;font-size:14.5px}
+.lvl b{font-family:var(--f-display)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="temas.html"><img src="assets/img/logo-quimiverso.png" alt="Quimiverso" width="140" height="45"><span>El mundo de los gases</span></a>
+  <nav class="nav" aria-label="Secciones">
+    <a href="temas.html">← Temas</a><a href="#ruta">Ruta</a><a href="#laboratorios">Laboratorios</a><a href="evaluacion.html">Evaluación</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Unidad de leyes de los gases · 3 semanas</p>
+      <h1>¿Qué hay en <em>el aire</em>?</h1>
+      <p class="lead">Explorando el comportamiento de los gases: un recorrido teórico-práctico por las teorías, leyes y principios que explican cómo se comportan los gases, desde la clase y los simuladores hasta el laboratorio.</p>
+      <div class="chips meta">
+        <span class="chip y">Química General</span><span class="chip">Grado décimo</span><span class="chip">Teórico-práctico</span><span class="chip">Presencial</span><span class="chip">4 h por semana</span>
+      </div>
+      <div class="btnrow">
+        <a class="btn pri" href="#ruta">Empezar la ruta</a>
+        <a class="btn" href="laboratorios/">Laboratorios virtuales</a>
+      </div>
+      <p class="note" style="margin-top:16px">Profesor Germán Holland Enamorado Montes · IE Juan XXIII · Ciencias Naturales</p>
+    </div>
+  </section>
+
+  <section class="blk" id="ruta" aria-labelledby="h-ruta">
+    <div class="shead"><h2 id="h-ruta">Ruta de la unidad</h2><p>Cada semana tiene dos sesiones de dos horas: una en el aula con varios momentos y otra en el laboratorio.</p></div>
+    <div class="wtabs" role="tablist" id="wtabs"></div>
+    <div id="weeks"></div>
+  </section>
+
+  <section class="blk" id="laboratorios" aria-labelledby="h-labs">
+    <div class="shead"><h2 id="h-labs">Laboratorios virtuales</h2><p>Antes de cada laboratorio real, practica en el mesón virtual: elige materiales, monta el experimento, toma medidas y responde la evaluación. Tu avance queda registrado para el profesor.</p></div>
+    <div class="labs">
+      <article class="card labc"><span class="wk">Antes del laboratorio #1</span><div class="row"><h3>Boyle</h3><span class="law">P·V = k</span></div><p>Aire encerrado en una jeringa de 60 mL con pesas encima: calcula la presión y observa cómo baja el volumen.</p><div class="btnrow" style="margin-top:auto"><a class="btn sm pri" href="laboratorios/#boyle">Abrir laboratorio</a><a class="btn sm" href="guias/boyle.html">Guía</a></div></article>
+      <article class="card labc"><span class="wk">Antes del laboratorio #1</span><div class="row"><h3>Charles</h3><span class="law">V/T = k</span></div><p>Jeringa sellada en baños de 0 °C a 95 °C: lee el volumen y extrapola hasta el cero absoluto.</p><div class="btnrow" style="margin-top:auto"><a class="btn sm pri" href="laboratorios/#charles">Abrir laboratorio</a><a class="btn sm" href="guias/charles.html">Guía</a></div></article>
+      <article class="card labc"><span class="wk">Antes del laboratorio #2</span><div class="row"><h3>Avogadro</h3><span class="law">V/n = k</span></div><p>CO₂ de bicarbonato y ácido acético infla tres globos: estima su volumen a partir del diámetro.</p><div class="btnrow" style="margin-top:auto"><a class="btn sm pri" href="laboratorios/#avogadro">Abrir laboratorio</a><a class="btn sm" href="guias/avogadro.html">Guía</a></div></article>
+      <article class="card labc"><span class="wk">Antes del laboratorio #3</span><div class="row"><h3>Graham</h3><span class="law">v₁/v₂ = √(M₂/M₁)</span></div><p>NH₃ y HCl se difunden por un tubo hasta formar un anillo blanco: cronometra y mide cuánto avanzó cada gas.</p><div class="btnrow" style="margin-top:auto"><a class="btn sm pri" href="laboratorios/#graham">Abrir laboratorio</a><a class="btn sm" href="guias/graham.html">Guía</a></div></article>
+    </div>
+    <p class="note" style="margin-top:12px">Lee la guía antes de entrar a cada laboratorio. Gay-Lussac y Dalton se trabajan con los simuladores de la semana 2 y en el laboratorio real.</p>
+  </section>
+
+  <section class="blk" id="evaluacion" aria-labelledby="h-ev">
+    <div class="shead"><h2 id="h-ev">Cómo se evalúa y cómo recibes realimentación</h2><a class="btn sm" href="evaluacion.html">Entregables y rúbricas →</a></div>
+    <div class="ev">
+      <article class="card"><h3>Instrumentos</h3><ul><li>Rúbricas (carteleras, videoresumen, infografía)</li><li>Resolución de problemas (situación problema)</li><li>Estudio de casos</li><li>Preguntas de selección múltiple con única respuesta</li><li>Preinformes e informes de laboratorio</li></ul></article>
+      <article class="card"><h3>Estrategias</h3><ul><li>Aprendizaje individual y colaborativo</li><li>Clase invertida (flipped classroom) y aprendizaje activo</li><li>Aprendizaje basado en problemas, en casos, en ciencias y en juegos</li></ul></article>
+      <article class="card"><h3>Realimentación</h3><div class="lvl"><div><b>De tarea:</b> qué está bien y qué corregir en lo que entregaste.</div><div><b>De proceso:</b> cómo llegaste a tu respuesta y qué estrategia te conviene.</div><div><b>De autorregulación:</b> cómo revisas tu propio trabajo y decides qué mejorar.</div></div>
+        <p class="note" style="margin-top:12px">Llega en clase, individual o en grupo, y por escrito en tu carpeta de Drive.</p>
+        <div class="btnrow" style="margin-top:10px"><a class="btn sm" data-link="carpetaDrive"><span class="lbl" data-pronto="Carpeta de Drive · pronto">Abrir mi carpeta de Drive</span></a></div></article>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap"><span>Quimiverso · IE Juan XXIII · Química General · Grado décimo · Prof. Germán Holland Enamorado Montes</span><span><a href="docente.html">Acceso docente</a></span></div></footer>
+
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+<script>
+/* ---------- contenido de la ruta (tomado de la propuesta e-learning) ---------- */
+const R = (label, href, link, pri) => ({ label, href, link, pri });
+const WEEKS = [
+ { n:1, titulo:'Presión, volumen y temperatura', leyes:['Boyle','Charles','Teoría cinético-molecular'], ra:'Resultado 1',
+   sesiones:[
+    { t:'Sesión 1 · Aula', h:'2 horas · 3 momentos', momentos:[
+      { k:'1', titulo:'Clase magistral 1', strat:'Aprendizaje activo', do:'Leyes de Boyle y Charles y postulados de la teoría cinético-molecular, con un video corto de cada fenómeno. Participa, pasa al tablero a resolver ejercicios y toma apuntes.', rec:[R('Diapositivas semana 1',null,'diapositivas1')], ent:'<b>Apuntes en el cuaderno</b> · individual, estilo libre.' },
+      { k:'2', titulo:'Simulaciones PhET', strat:'Aprendizaje basado en ciencias', do:'En la pantalla interactiva cambia presión, volumen y temperatura, observa las partículas, toma datos y haz tablas y gráficas en el cuaderno. Luego explica lo que pasa con la teoría cinético-molecular.', rec:[R('Propiedades de los gases',null,'phetPropiedades'),R('Gases: introducción',null,'phetGases')], ent:'<b>Cuaderno:</b> registro de datos, gráficas del simulador y explicación escrita.' },
+      { k:'3', titulo:'Situación problema', strat:'Aprendizaje basado en problemas', do:'Entra al aplicativo y resuelve un reto contextualizado aplicando las leyes de Boyle y Charles: predice, calcula, evalúa tu predicción y propone una solución. Después lee la realimentación en tu carpeta de Drive.', rec:[R('Abrir el reto','reto.html',null,true),R('Carpeta de Drive',null,'carpetaDrive')], ent:'<b>Formulario digital</b> del aplicativo.' }
+    ]},
+    { t:'Sesión 2 · Laboratorio', h:'2 horas', lab:{ titulo:'Laboratorio de gases #1 · Boyle y Charles', strat:'Aprendizaje basado en ciencias · colaborativo',
+      do:'Comprueba las leyes de Boyle y Charles en grupo. Antes de la sesión, lee las guías y haz las prácticas virtuales: llegarás con tu hipótesis, tu diagrama de flujo y resultados esperados para el preinforme.',
+      rec:[R('Guía: Boyle','guias/boyle.html',null,true),R('Guía: Charles','guias/charles.html',null,true),R('Virtual: Boyle','laboratorios/#boyle'),R('Virtual: Charles','laboratorios/#charles')],
+      mat:['Jeringas y pesas','Globos y recipientes','Termómetro y balanza','Hielo y agua caliente'],
+      ent:['<b>Preinforme</b> escrito a mano, grupal, al terminar la práctica','<b>Informe de práctica</b> digital, grupal, 7 días después'] } }
+   ]},
+ { n:2, titulo:'Temperatura, presión y cantidad de gas', leyes:['Gay-Lussac','Avogadro','PV = nRT'], ra:'Resultados 1 y 2',
+   sesiones:[
+    { t:'Sesión 1 · Aula', h:'2 horas · 3 momentos', momentos:[
+      { k:'1', titulo:'Clase magistral 2', strat:'Aprendizaje activo', do:'Leyes de Gay-Lussac y Avogadro y ecuación de los gases ideales (PV = nRT), con un video del fenómeno. Participa, pasa al tablero y toma apuntes.', rec:[R('Diapositivas semana 2',null,'diapositivas2')], ent:'<b>Apuntes en el cuaderno</b> · individual, estilo libre.' },
+      { k:'2', titulo:'Simulaciones en inglés', strat:'Aprendizaje basado en ciencias · U. de Texas y AACT', do:'Varía temperatura, presión y cantidad de sustancia en los modelos interactivos, toma datos y haz tablas y gráficas. Explica los cambios con la teoría cinético-molecular y responde las preguntas de la simulación de la AACT.', rec:[R('Simulador U. de Texas',null,'simuladorTexas'),R('Simulación con preguntas (AACT)',null,'simuladorAACT')], ent:'<b>Cuaderno:</b> registro de datos, gráficas del simulador y explicación escrita.' },
+      { k:'3', titulo:'Estudio de casos', strat:'Aprendizaje basado en casos', do:'Tres situaciones reales: la olla a presión, las llantas en verano y el airbag. Responde las preguntas guiadas para comprender, explicar y modelar cada caso y termina con la prueba.', rec:[R('Abrir los casos','casos.html',null,true),R('Carpeta de Drive',null,'carpetaDrive')], ent:'<b>Prueba de selección múltiple</b> con única respuesta.' }
+    ]},
+    { t:'Sesión 2 · Laboratorio', h:'2 horas', lab:{ titulo:'Laboratorio de gases #2 · Gay-Lussac y Avogadro', strat:'Aprendizaje basado en ciencias · colaborativo',
+      do:'Comprueba la ley de Gay-Lussac y el principio de Avogadro con una reacción que produce gas. Practica antes en el laboratorio virtual de Avogadro.',
+      rec:[R('Guía: Avogadro','guias/avogadro.html',null,true),R('Virtual: Avogadro','laboratorios/#avogadro'),R('Rúbrica del videoresumen','evaluacion.html#video')],
+      mat:['Latas, mechero o plancha y pinzas','Recipiente con agua fría','Bicarbonato y ácido acético','Globos, balanza y cinta métrica'],
+      ent:['<b>Videoresumen</b> de máximo 2 minutos, con imágenes reales y audio original del grupo','<b>Informe de práctica</b> digital, grupal, 7 días después'] } }
+   ]},
+ { n:3, titulo:'Mezclas de gases y difusión', leyes:['Dalton','Graham'], ra:'Resultado 3',
+   sesiones:[
+    { t:'Sesión 1 · Aula', h:'2 horas · 2 momentos', momentos:[
+      { k:'1', titulo:'Clase invertida: juego de carteleras', strat:'Flipped classroom · colaborativo', do:'Antes de clase: con tu grupo prepara el tema asignado usando las diapositivas de las clases 1 y 2 y las complementarias de Dalton y Graham, y envía el diseño digital. En clase: instala la cartelera y preséntala.', rec:[R('Diapositivas semana 1',null,'diapositivas1'),R('Diapositivas semana 2',null,'diapositivas2'),R('Dalton y Graham',null,'diapositivasDaltonGraham'),R('Rúbrica de carteleras','evaluacion.html#carteleras'),R('Enviar diseño digital',null,'entregas')], ent:'<b>Cartelera</b> grupal de 100 × 90 cm, en versión digital e impresa.' },
+      { k:'2', titulo:'Trivia: concurso de puntos', strat:'Aprendizaje basado en juegos', do:'Regístrate en la trivia y responde tres retos de dificultad creciente con preguntas hechas a partir de las carteleras. Gana quien más preguntas acierte.', rec:[R('Entrar a la trivia',null,'trivia',true)], ent:'<b>Cuestionario de trivia</b> sobre las leyes de los gases.' }
+    ]},
+    { t:'Sesión 2 · Laboratorio', h:'2 horas', lab:{ titulo:'Laboratorio de gases #3 · Graham y Dalton', strat:'Aprendizaje basado en ciencias · colaborativo',
+      do:'Comprueba la ley de Graham con la difusión de NH₃ y HCl y la ley de Dalton recogiendo gas sobre agua. Practica antes en el laboratorio virtual de Graham.',
+      rec:[R('Guía: Graham','guias/graham.html',null,true),R('Virtual: Graham','laboratorios/#graham'),R('Rúbrica de la infografía','evaluacion.html#infografia')],
+      mat:['Tubo de vidrio y algodones','NH₃ y HCl','Probeta y recipiente con agua','Agua oxigenada, levadura y regla'],
+      seg:'El NH₃ y el HCl los manipula solo el profesor, en un espacio ventilado.',
+      ent:['<b>Infografía</b> con imágenes reales de los materiales y los pasos del método científico','<b>Informe de práctica</b> digital, grupal, 7 días después'] } }
+   ]}
+];
+const esc = QG.esc;
+function btn(r){
+  const cls = 'btn sm' + (r.pri ? ' pri' : '');
+  if (r.link) return '<a class="' + cls + '" data-link="' + r.link + '"><span class="lbl" data-pronto="' + esc(r.label) + ' · pronto">' + esc(r.label) + '</span></a>';
+  return '<a class="' + cls + '" href="' + r.href + '">' + esc(r.label) + '</a>';
+}
+function renderWeeks(){
+  const tabs = document.getElementById('wtabs'), box = document.getElementById('weeks');
+  tabs.innerHTML = WEEKS.map(w => '<button class="wtab" role="tab" id="tab-' + w.n + '" aria-controls="semana-' + w.n + '" aria-selected="false"><span class="eyebrow">Semana ' + w.n + '</span><b>' + esc(w.titulo) + '</b><span class="t">' + w.leyes.map(esc).join(' · ') + '</span></button>').join('');
+  box.innerHTML = WEEKS.map(w => '<div class="week" role="tabpanel" id="semana-' + w.n + '" aria-labelledby="tab-' + w.n + '" hidden>' +
+    '<div class="wintro"><span class="chips">' + w.leyes.map(l => '<span class="chip y">' + esc(l) + '</span>').join('') + '</span></div>' +
+    w.sesiones.map(s => '<div class="sess"><h3>' + esc(s.t) + ' <span>' + esc(s.h) + '</span></h3>' + (s.momentos ?
+      '<div class="moms">' + s.momentos.map(m => '<article class="card mom"><div class="mh"><span class="k">M' + m.k + '</span><div><h4>' + esc(m.titulo) + '</h4><p class="strat">' + esc(m.strat) + '</p></div></div><p class="do">' + esc(m.do) + '</p><div class="btnrow">' + m.rec.map(btn).join('') + '</div><p class="ent">' + m.ent + '</p></article>').join('') + '</div>'
+      : (l => '<div class="moms"><article class="card mom lab"><div style="display:flex;flex-direction:column;gap:12px"><div class="mh"><span class="k">L' + w.n + '</span><div><h4>' + esc(l.titulo) + '</h4><p class="strat">' + esc(l.strat) + '</p></div></div><p class="do">' + esc(l.do) + '</p><div class="btnrow">' + l.rec.map(btn).join('') + '</div></div>' +
+        '<div class="side"><h5>Materiales</h5><ul>' + l.mat.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' + (l.seg ? '<p class="warn">' + esc(l.seg) + '</p>' : '') + '<h5>Entregables</h5><ul>' + l.ent.map(x => '<li>' + x + '</li>').join('') + '</ul></div></article></div>')(s.lab)) + '</div>').join('') + '</div>').join('');
+  tabs.querySelectorAll('.wtab').forEach((b, i) => {
+    b.onclick = () => show(i + 1, true);
+    b.onkeydown = e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ const n = ((i + (e.key === 'ArrowRight' ? 1 : -1) + 3) % 3) + 1; show(n, true); document.getElementById('tab-' + n).focus(); } };
+  });
+}
+function show(n, push){
+  WEEKS.forEach(w => { document.getElementById('semana-' + w.n).hidden = w.n !== n; document.getElementById('tab-' + w.n).setAttribute('aria-selected', w.n === n); document.getElementById('tab-' + w.n).tabIndex = w.n === n ? 0 : -1; });
+  if (push) history.replaceState(null, '', '#semana-' + n);
+}
+renderWeeks();
+const m = location.hash.match(/semana-(\d)/);
+show(m ? +m[1] : 1, false);
+if (m) setTimeout(() => document.getElementById('ruta').scrollIntoView(), 50);
+
+</script>
+</body>
+</html>

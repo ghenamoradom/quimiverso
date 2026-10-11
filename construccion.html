@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>En construcción · Quimiverso</title>
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* En construcción: texto a la izquierda, modelo atómico 3D a la derecha en un panel oscuro */
+.cons{padding:44px 0 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:36px;align-items:center}
+.cons h1{font-size:clamp(32px,5vw,50px);margin-top:8px}
+.cons .lead{color:var(--muted);font-size:17px;margin-top:14px;max-width:46ch}
+.cons .tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--warn);background:#fff6e6;border-radius:999px;padding:5px 12px}
+.cons .tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.cons .btnrow{margin-top:22px}
+.stage{position:relative;aspect-ratio:1/1;width:100%;max-width:520px;justify-self:center;border-radius:20px;overflow:hidden;background:radial-gradient(70% 70% at 50% 45%,#13213a,#070c16)}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .cap{position:absolute;left:14px;bottom:12px;right:14px;font-size:12.5px;color:#9fb3c8;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;pointer-events:none}
+.stage .cap b{color:#dce7f3;font-weight:700}
+.legend{display:flex;gap:14px;align-items:center}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.nojs{position:absolute;inset:0;display:grid;place-items:center;color:#9fb3c8;font-size:14px;text-align:center;padding:20px}
+@media (max-width:820px){.cons{grid-template-columns:1fr}.stage{max-width:440px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="temas.html"><img src="assets/img/logo-quimiverso.png" alt="Quimiverso" width="140" height="45"></a>
+  <nav class="nav" aria-label="Secciones"><a href="temas.html">← Banco de temas</a></nav>
+</div></header>
+
+<main class="wrap">
+  <section class="cons">
+    <div>
+      <span class="tag">En construcción</span>
+      <h1 id="tema">Este tema</h1>
+      <p class="lead">Estamos preparando las clases, simuladores, laboratorios virtuales y retos de este tema. Mientras tanto, puedes explorar <a href="gases.html">El mundo de los gases</a>.</p>
+      <div class="btnrow"><a class="btn pri" href="temas.html">Volver al banco de temas</a><a class="btn" href="gases.html">El mundo de los gases</a></div>
+    </div>
+    <div class="stage" id="stage" role="img" aria-label="Modelo atómico actual en 3D: núcleo de protones y neutrones rodeado por nubes electrónicas">
+      <noscript><div class="nojs">El modelo 3D necesita JavaScript.</div></noscript>
+      <div class="cap"><span><b>Modelo atómico actual</b> · arrastra para girar</span><span class="legend"><span><i style="background:#e5486e"></i>protón</span><span><i style="background:#3cc06a"></i>neutrón</span><span><i style="background:#5aa8ff"></i>nube electrónica</span></span></div>
+    </div>
+  </section>
+</main>
+<footer class="foot"><div class="wrap"><span>Quimiverso · IE Juan XXIII · Prof. Germán Holland Enamorado Montes</span></div></footer>
+
+<script>
+(function(){
+  const t = new URLSearchParams(location.search).get('tema');
+  if (t){ const s = t.slice(0, 60); document.getElementById('tema').textContent = s; document.title = s + ' · En construcción · Quimiverso'; }
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  const stage = document.getElementById('stage');
+  if (!window.THREE){ stage.insertAdjacentHTML('afterbegin', '<div class="nojs">No se pudo cargar el modelo 3D. Revisa tu conexión a internet.</div>'); return; }
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
+  catch(e){ stage.insertAdjacentHTML('afterbegin', '<div class="nojs">Tu navegador no puede mostrar gráficos 3D.</div>'); return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  stage.insertBefore(renderer.domElement, stage.firstChild);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(0, 0.6, 11);
+  const controls = THREE.OrbitControls ? new THREE.OrbitControls(camera, renderer.domElement) : null;
+  if (controls){ controls.enablePan = false; controls.enableZoom = false; controls.enableDamping = true; controls.dampingFactor = .08; controls.autoRotate = !reduce; controls.autoRotateSpeed = .8; }
+
+  scene.add(new THREE.AmbientLight(0xffffff, .35));
+  const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(4, 6, 8); scene.add(key);
+  const rim = new THREE.DirectionalLight(0x6fb6ff, .8); rim.position.set(-6, -2, -4); scene.add(rim);
+
+  /* Núcleo: 7 protones y 8 neutrones empaquetados */
+  const nucleus = new THREE.Group(); scene.add(nucleus);
+  const geo = new THREE.SphereGeometry(.34, 32, 24);
+  const matP = new THREE.MeshStandardMaterial({ color: 0xe5486e, roughness: .35, metalness: .05 });
+  const matN = new THREE.MeshStandardMaterial({ color: 0x3cc06a, roughness: .35, metalness: .05 });
+  const N = 15, pts = [];
+  for (let i = 0; i < N; i++){
+    const y = 1 - (i + .5) * 2 / N, r = Math.sqrt(1 - y * y), th = i * 2.399963;
+    pts.push(new THREE.Vector3(Math.cos(th) * r, y, Math.sin(th) * r).multiplyScalar(i % 4 === 0 ? .25 : .5));
+  }
+  for (let it = 0; it < 60; it++){ // relaja posiciones para que las esferas no se encimen
+    for (let a = 0; a < N; a++) for (let b = a + 1; b < N; b++){
+      const d = pts[a].clone().sub(pts[b]), L = d.length(), m = .6;
+      if (L < m){ d.setLength((m - L) / 2); pts[a].add(d); pts[b].sub(d); }
+    }
+    pts.forEach(p => p.multiplyScalar(.985));
+  }
+  const balls = pts.map((p, i) => { const m = new THREE.Mesh(geo, i % 2 ? matN : matP); m.position.copy(p); m.userData.base = p.clone(); m.userData.ph = Math.random() * 6.28; nucleus.add(m); return m; });
+
+  /* Nubes electrónicas: esferas deformadas con ruido y brillo de borde */
+  const vsh = `
+    uniform float uT; uniform float uAmp; uniform float uSeed;
+    varying vec3 vN; varying vec3 vV;
+    float n3(vec3 p){ return sin(p.x*1.7+uT*.6+uSeed)*sin(p.y*2.1-uT*.5)*sin(p.z*1.9+uT*.4+uSeed*.5)
+                     + .5*sin(p.x*3.3-uT*.9)*sin(p.y*3.7+uT*.7+uSeed)*sin(p.z*3.1-uT*.8); }
+    void main(){
+      vec3 p = position + normal * n3(position) * uAmp;
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz);
+      gl_Position = projectionMatrix * mv;
+    }`;
+  const fsh = `
+    uniform vec3 uCol; uniform float uOp;
+    varying vec3 vN; varying vec3 vV;
+    void main(){
+      float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);
+      gl_FragColor = vec4(uCol, (f * .95 + .05) * uOp);
+    }`;
+  function cloud(r, amp, op, seed){
+    const g = new THREE.Group();
+    [THREE.BackSide, THREE.FrontSide].forEach((side, k) => {
+      const m = new THREE.ShaderMaterial({ vertexShader: vsh, fragmentShader: fsh, transparent: true, depthWrite: false, side,
+        blending: THREE.AdditiveBlending, uniforms: { uT: { value: 0 }, uAmp: { value: amp }, uSeed: { value: seed + k }, uCol: { value: new THREE.Color(0x5aa8ff) }, uOp: { value: op * (k ? 1 : .6) } } });
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(r, 96, 64), m));
+    });
+    scene.add(g); return g;
+  }
+  const clouds = [cloud(1.7, .15, .5, 0), cloud(2.7, .22, .36, 3)];
+
+  function size(){ const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  size(); addEventListener('resize', size);
+
+  const clock = new THREE.Clock();
+  function frame(){
+    const t = clock.getElapsedTime();
+    balls.forEach(b => { const s = .025; b.position.set(b.userData.base.x + Math.sin(t * 3 + b.userData.ph) * s, b.userData.base.y + Math.cos(t * 2.6 + b.userData.ph) * s, b.userData.base.z + Math.sin(t * 2.2 + b.userData.ph * 2) * s); });
+    nucleus.rotation.y = t * .25;
+    clouds.forEach((c, i) => { c.rotation.y = t * (i ? -.05 : .08); c.rotation.x = Math.sin(t * .2 + i) * .15; c.children.forEach(m => m.material.uniforms.uT.value = t); });
+    if (controls) controls.update();
+    renderer.render(scene, camera);
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  frame();
+  if (reduce && controls) controls.addEventListener('change', () => renderer.render(scene, camera));
+})();
+</script>
+</body>
+</html>

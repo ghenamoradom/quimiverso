@@ -2,7 +2,10 @@
 
 Entorno virtual de la unidad **«¿Qué hay en el aire? Explorando el comportamiento de los gases»** (IE Juan XXIII, Prof. Germán Holland Enamorado Montes).
 
-- `index.html`: portada del curso, resultados de aprendizaje y ruta de 3 semanas
+- `index.html`: portada de Quimiverso (logo y botón Ingresar)
+- `temas.html`: banco de temas
+- `construccion.html`: página «En construcción» con el modelo atómico 3D
+- `gases.html`: tema «El mundo de los gases», con la ruta de 3 semanas
 - `reto.html`: situación problema (semana 1)
 - `casos.html`: estudio de casos y prueba (semana 2)
 - `laboratorios/`: laboratorios virtuales 3D (un archivo por práctica) de Boyle, Avogadro, Charles y Graham, con registro

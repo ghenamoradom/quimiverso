@@ -29,8 +29,8 @@
   /* Se comparte con los laboratorios virtuales, que guardan {est, nombre, curso} en 'labgases-id' */
   function quien(){
     const l = store.get('labgases-id');
-    if (l && l.nombre && l.curso) return { estudiante_id: l.est || null, nombre: l.nombre, curso: l.curso };
-    const q = store.get(ID_KEY); return q && q.nombre ? q : null;
+    if (l && l.nombre && l.curso && l.nombre !== 'Estudiante anónimo') return { estudiante_id: l.est || null, nombre: l.nombre, curso: l.curso };
+    const q = store.get(ID_KEY); return q && q.nombre ? q : (IDENTIFICAR ? null : ANONIMO);
   }
   function guardarQuien(q){ store.set(ID_KEY, q); store.set('labgases-id', { est: q.estudiante_id || null, nombre: q.nombre, curso: q.curso }); }
   function pintarQuien(){
@@ -88,7 +88,11 @@
     });
   }
   function claveDe(q){ const s = (q.estudiante_id || (q.curso + '|' + q.nombre)).toLowerCase(); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
-  async function asegurarIdentidad(){ return quien() || await pedirIdentidad(true); }
+  /* Por ahora el sitio no pide identificación: las respuestas se guardan como anónimas.
+     Para volver a pedir nombre, cambia IDENTIFICAR a true. */
+  const IDENTIFICAR = false;
+  const ANONIMO = { estudiante_id: null, nombre: 'Estudiante anónimo', curso: null };
+  async function asegurarIdentidad(){ return quien() || (IDENTIFICAR ? await pedirIdentidad(true) : ANONIMO); }
 
   /* ---------- enlaces del curso ---------- */
   function enlaces(){
