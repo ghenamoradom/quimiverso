@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Panel docente · Química General 10.°</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1315'/%3E%3Ccircle cx='10' cy='11' r='3.2' fill='%23ffd23f'/%3E%3Ccircle cx='21' cy='9' r='2.4' fill='%236cc4ff'/%3E%3Ccircle cx='16' cy='20' r='3' fill='%236cc4ff'/%3E%3Ccircle cx='24' cy='22' r='2.2' fill='%23ffd23f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Panel: barra de filtros; pestañas reto / casos / laboratorios; tabla + detalle lateral */
+.wrap{max-width:1240px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;padding:24px 0 12px}
+.bar h1{font-size:28px}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctrl select{width:auto;font-size:14px;padding:7px 10px}
+.upd{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{font:inherit;border:0;background:none;color:var(--muted);font-weight:700;padding:10px 14px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+.sums{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:16px 0}
+.sum{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.sum b{display:block;font-family:var(--f-display);font-size:28px;font-variant-numeric:tabular-nums}
+.sum span{font-size:13px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:14px;align-items:start}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}}
+.tblw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr.r{cursor:pointer}
+tr.r:hover td,tr.r.sel td{background:var(--panel2)}
+td small{color:var(--muted);margin-left:6px}
+.ok{color:var(--ok)}.no{color:var(--bad)}.mid{color:var(--warn)}
+.det{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:70px;max-height:calc(100vh - 86px);overflow-y:auto}
+.det h3{font-size:20px}
+.det h4{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 0}
+.det .ans{background:var(--panel2);border-radius:8px;padding:8px 10px;font-size:14.5px;white-space:pre-wrap}
+.det .ans.empty{color:var(--muted);font-style:italic}
+.det .kv{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:14px}
+.det .kv b{font-family:var(--f-mono);font-weight:500;text-align:right}
+.qst{display:flex;flex-direction:column;gap:8px}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) 140px 56px;gap:10px;align-items:center;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.qrow .b{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.qrow .b i{display:block;height:100%;background:var(--accent)}
+.qrow b{font-family:var(--f-mono);text-align:right;font-weight:500}
+#login{max-width:420px;margin:80px auto;display:flex;flex-direction:column;gap:12px}
+#login[hidden],#app[hidden]{display:none}
+.empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1b2629"/><circle cx="10" cy="11" r="3.2" fill="#ffd23f"/><circle cx="21" cy="9" r="2.4" fill="#6cc4ff"/><circle cx="16" cy="20" r="3" fill="#6cc4ff"/><circle cx="24" cy="22" r="2.2" fill="#ffd23f"/></svg><span>Química General 10.°</span></a>
+  <nav class="nav"><a href="./">← Volver al curso</a></nav>
+</div></header>
+
+<main class="wrap">
+  <form class="card" id="login">
+    <h1 style="font-size:26px">Acceso docente</h1>
+    <p class="note">Usa la misma contraseña del tablero de los laboratorios. La verifica la base de datos; no está guardada en esta página.</p>
+    <label class="f">Contraseña<input id="pw" type="password" autocomplete="current-password"></label>
+    <button class="btn pri" type="submit" id="go">Entrar</button>
+    <p class="note" id="lmsg" role="status"></p>
+  </form>
+
+  <div id="app" hidden>
+    <div class="bar"><div><h1>Panel docente</h1><p class="note">Respuestas de la situación problema y del estudio de casos</p></div>
+      <div class="ctrl"><select id="fCurso" aria-label="Curso"><option value="">Todos los cursos</option></select><select id="fDias" aria-label="Periodo"><option value="14">Últimos 14 días</option><option value="60" selected>Últimos 60 días</option><option value="365">Último año</option></select><button class="btn sm" id="csv">Descargar CSV</button><button class="btn sm pri" id="reload">Actualizar</button><span class="upd" id="upd"></span></div></div>
+    <nav class="tabs" role="tablist"><button role="tab" data-t="reto" aria-selected="true">Situación problema</button><button role="tab" data-t="casos" aria-selected="false">Estudio de casos</button><button role="tab" data-t="labs" aria-selected="false">Laboratorios virtuales</button></nav>
+    <section id="v-reto"><div class="sums" id="s-reto"></div><div class="layout"><div class="tblw"><table id="t-reto"></table></div><aside class="det" id="d-reto"><p class="empty">Elige un estudiante para leer sus respuestas y escribir la realimentación.</p></aside></div></section>
+    <section id="v-casos" hidden><div class="sums" id="s-casos"></div><div class="layout"><div class="tblw"><table id="t-casos"></table></div><aside class="det" id="d-casos"><p class="empty">Elige un estudiante para ver sus respuestas.</p></aside></div>
+      <h2 style="font-size:20px;margin:22px 0 10px">Acierto por pregunta de la prueba</h2><div class="qst" id="qst"></div></section>
+    <section id="v-labs" hidden><div class="card" style="margin-top:16px;max-width:640px;display:flex;flex-direction:column;gap:10px"><h2 style="font-size:22px">Seguimiento de los laboratorios virtuales</h2><p>Los ingresos, la nota de ejecución y comprensión, el banco de preguntas y la lista de estudiantes están en el tablero de los laboratorios. Entra con la misma contraseña.</p><div class="btnrow"><a class="btn pri" href="laboratorios/#docente">Abrir el tablero de laboratorios</a></div><p class="note">Ahí también se carga la lista de estudiantes. Cuando la cargues, en todo el sitio los estudiantes eligen su nombre en lugar de escribirlo.</p></div></section>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+<script>
+(function(){
+const { $, esc, rpc } = QG;
+let CLAVE = null, DATA = null, TAB = 'reto';
+const fmt = (n, d = 1) => n == null || isNaN(n) ? '—' : Number(n).toLocaleString('es-CO', { maximumFractionDigits: d });
+const date = s => new Date(s).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+const ERR = { clave_incorrecta: 'Contraseña incorrecta.', acceso_bloqueado: 'Demasiados intentos fallidos. Espera 15 minutos.', red: 'Sin conexión con la base de datos. Revisa internet; si Supabase estaba pausado, reactívalo en supabase.com.' };
+async function load(){
+  $('#upd').textContent = 'Consultando…';
+  const r = await rpc('docente_apps', { p_clave: CLAVE, p_dias: +$('#fDias').value });
+  if (r && r.error) throw Object.assign(new Error(r.error), { code: r.error });
+  DATA = r; $('#upd').textContent = 'Actualizado ' + new Date(r.generado).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+  const cs = [...new Set(DATA.envios.map(e => e.curso).filter(Boolean))].sort(), sel = $('#fCurso'), cur = sel.value;
+  sel.innerHTML = '<option value="">Todos los cursos</option>' + cs.map(c => '<option' + (c === cur ? ' selected' : '') + '>' + esc(c) + '</option>').join('');
+  render();
+}
+$('#login').onsubmit = async e => {
+  e.preventDefault(); CLAVE = $('#pw').value; if (!CLAVE) return;
+  $('#go').disabled = true; $('#lmsg').textContent = 'Verificando…';
+  try { await load(); $('#login').hidden = true; $('#app').hidden = false; $('#pw').value = ''; }
+  catch(err){ CLAVE = null; $('#lmsg').textContent = ERR[err.code] || ERR.red; }
+  finally { $('#go').disabled = false; }
+};
+$('#reload').onclick = () => load().catch(e => $('#upd').textContent = ERR[e.code] || ERR.red);
+$('#fDias').onchange = $('#reload').onclick; $('#fCurso').onchange = () => render();
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { TAB = b.dataset.t; document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); ['reto','casos','labs'].forEach(t => $('#v-' + t).hidden = t !== TAB); $('#csv').hidden = TAB === 'labs'; });
+
+const list = app => DATA.envios.filter(e => e.app === app && (!$('#fCurso').value || e.curso === $('#fCurso').value));
+const mark = c => !c ? '<span class="empty">—</span>' : c.ok ? '<span class="ok">✓</span><small>' + c.intentos + ' int.</small>' : '<span class="no">✗</span><small>' + c.intentos + ' int.</small>';
+const PRED = { si: 'Revienta', no: 'Entero', nose: 'No se sabe' };
+const ans = (t, lab) => '<h4>' + esc(lab) + '</h4><div class="ans' + ((t || '').trim() ? '' : ' empty') + '">' + ((t || '').trim() ? esc(t) : 'Sin respuesta') + '</div>';
+const sums = (el, a) => el.innerHTML = a.map(x => '<div class="sum"><b>' + x[1] + '</b><span>' + esc(x[0]) + '</span></div>').join('');
+
+function render(){ renderReto(); renderCasos(); }
+function renderReto(){
+  const L = list('reto');
+  const env = L.filter(e => e.completado).length, calc = L.filter(e => { const c = (e.respuestas || {}).checks || {}; return c.v1 && c.v1.ok && c.v2 && c.v2.ok && c.v3 && c.v3.ok; }).length;
+  sums($('#s-reto'), [['Estudiantes que entraron', L.length], ['Enviaron el reto', env], ['Los 3 cálculos correctos', calc], ['Acertaron la predicción', L.filter(e => ((e.respuestas || {}).r || {}).prediccion === 'no').length]]);
+  const t = $('#t-reto');
+  t.innerHTML = '<thead><tr><th>Estudiante</th><th>Pasos</th><th>Boyle</th><th>Charles</th><th>Escenario 2</th><th>Predicción</th><th>Estado</th><th>Última actividad</th></tr></thead><tbody>' +
+    (L.length ? L.map((e, i) => { const R = e.respuestas || {}, c = R.checks || {}, r = R.r || {};
+      return '<tr class="r" data-i="' + i + '"><td>' + esc(e.nombre) + '<small>' + esc(e.curso || '') + '</small></td><td class="mono">' + (R.pasos || 0) + '/8</td><td>' + mark(c.v1) + '</td><td>' + mark(c.v2) + '</td><td>' + mark(c.v3) + '</td><td>' + esc(PRED[r.prediccion] || '—') + '</td><td>' + (e.completado ? '<span class="ok">Enviado</span>' : '<span class="mid">En curso</span>') + '</td><td>' + date(e.actualizado) + '</td></tr>'; }).join('')
+     : '<tr><td colspan="8" class="empty">Todavía no hay respuestas en este periodo.</td></tr>') + '</tbody>';
+  t.querySelectorAll('tr.r').forEach(tr => tr.onclick = () => { t.querySelectorAll('tr').forEach(x => x.classList.remove('sel')); tr.classList.add('sel'); detReto(L[+tr.dataset.i]); });
+}
+function detReto(e){
+  const R = e.respuestas || {}, r = R.r || {}, c = R.checks || {}, A = { 1: 'Nada', 2: 'Poco', 3: 'Bien', 4: 'Muy bien' };
+  const v = k => c[k] ? fmt(c[k].ultimo) + ' mL ' + (c[k].ok ? '✓' : '✗') + ' · ' + c[k].intentos + ' intento(s)' : '—';
+  $('#d-reto').innerHTML = '<h3>' + esc(e.nombre) + '</h3><p class="note">' + esc(e.curso || '') + ' · ' + (e.completado ? 'Enviado' : 'En curso') + ' · ' + date(e.actualizado) + '</p>' +
+    '<div class="kv"><span>Qué cambia en el viaje</span><b>' + esc({ P: 'Solo P', T: 'Solo T', PT: 'P y T ✓', n: 'Cantidad' }[r.cambian] || '—') + '</b><span>Predicción inicial</span><b>' + esc(PRED[r.prediccion] || '—') + '</b><span>Paso 3 · Boyle</span><b>' + v('v1') + '</b><span>Paso 4 · Charles</span><b>' + v('v2') + '</b><span>Conclusión al amanecer</span><b>' + esc(PRED[r.revienta2] || '—') + (r.revienta2 === 'no' ? ' ✓' : r.revienta2 ? ' ✗' : '') + '</b><span>Paso 6 · mediodía</span><b>' + v('v3') + '</b><span>¿Revienta al mediodía?</span><b>' + esc(PRED[r.revienta3] || '—') + (r.revienta3 === 'si' ? ' ✓' : r.revienta3 ? ' ✗' : '') + '</b></div>' +
+    ans(r.sabemos, 'Qué datos conoce') + ans(r.necesitamos, 'Qué necesita averiguar') + ans(r.prediccion_por, 'Por qué predijo así') + ans(r.tcm1, 'Explicación TCM · presión') + ans(r.tcm2, 'Explicación TCM · enfriamiento') + ans(r.evalua_pred, 'Evaluación de su predicción') + ans(r.solucion, 'Propuesta de solución') +
+    '<h4>Autoevaluación</h4><div class="kv"><span>Entendió el problema</span><b>' + (A[r.a_entendi] || '—') + '</b><span>Cálculos sin ayuda</span><b>' + (A[r.a_calculos] || '—') + '</b><span>Explica con la TCM</span><b>' + (A[r.a_explico] || '—') + '</b></div>' + ans(r.mejorar, 'Qué haría distinto');
+}
+const CQ = [['olla_p','Olla · P'],['llanta_p','Llanta · P'],['airbag_n','Airbag · n'],['airbag_m','Airbag · masa']];
+function renderCasos(){
+  const L = list('casos');
+  const done = L.filter(e => (e.prueba || []).length >= DATA.preguntas.length);
+  const avg = done.length ? done.reduce((a, e) => a + e.prueba.filter(p => p.correcta).length, 0) / done.length : null;
+  sums($('#s-casos'), [['Estudiantes que entraron', L.length], ['Terminaron la prueba', done.length], ['Promedio en la prueba', avg == null ? '—' : fmt(avg) + '/' + DATA.preguntas.length], ['Completaron los 3 casos', L.filter(e => ((e.respuestas || {}).casos || []).length >= 3).length]]);
+  const t = $('#t-casos');
+  t.innerHTML = '<thead><tr><th>Estudiante</th><th>Casos</th>' + CQ.map(q => '<th>' + q[1] + '</th>').join('') + '<th>Prueba</th><th>Última actividad</th></tr></thead><tbody>' +
+    (L.length ? L.map((e, i) => { const R = e.respuestas || {}, c = R.checks || {}, p = e.prueba || [], ok = p.filter(x => x.correcta).length;
+      return '<tr class="r" data-i="' + i + '"><td>' + esc(e.nombre) + '<small>' + esc(e.curso || '') + '</small></td><td class="mono">' + (R.casos || []).length + '/3</td>' + CQ.map(q => '<td>' + mark(c[q[0]]) + '</td>').join('') + '<td class="mono">' + (p.length ? ok + '/' + p.length + (p.length < DATA.preguntas.length ? ' <small>en curso</small>' : '') : '—') + '</td><td>' + date(e.actualizado) + '</td></tr>'; }).join('')
+     : '<tr><td colspan="8" class="empty">Todavía no hay respuestas en este periodo.</td></tr>') + '</tbody>';
+  t.querySelectorAll('tr.r').forEach(tr => tr.onclick = () => { t.querySelectorAll('tr').forEach(x => x.classList.remove('sel')); tr.classList.add('sel'); detCasos(L[+tr.dataset.i]); });
+  const st = {}; L.forEach(e => (e.prueba || []).forEach(p => { st[p.pregunta] = st[p.pregunta] || { n: 0, c: 0 }; st[p.pregunta].n++; if (p.correcta) st[p.pregunta].c++; }));
+  $('#qst').innerHTML = DATA.preguntas.map(q => { const s = st[q.codigo], pct = s ? Math.round(s.c / s.n * 100) : null; return '<div class="qrow"><span>' + esc(q.enunciado) + '</span><span class="b"><i style="width:' + (pct || 0) + '%"></i></span><b>' + (pct == null ? '—' : pct + ' %') + '</b></div>'; }).join('');
+}
+function detCasos(e){
+  const R = e.respuestas || {}, r = R.r || {}, c = R.checks || {}, P = Object.fromEntries(DATA.preguntas.map(q => [q.codigo, q]));
+  const U = { olla_p: 'atm', llanta_p: 'psi', airbag_n: 'mol', airbag_m: 'g' };
+  $('#d-casos').innerHTML = '<h3>' + esc(e.nombre) + '</h3><p class="note">' + esc(e.curso || '') + ' · ' + date(e.actualizado) + '</p>' +
+    '<h4>Cálculos</h4><div class="kv">' + CQ.map(q => '<span>' + q[1] + '</span><b>' + (c[q[0]] ? fmt(c[q[0]].ultimo, 2) + ' ' + U[q[0]] + ' ' + (c[q[0]].ok ? '✓' : '✗') + ' · ' + c[q[0]].intentos + ' int.' : '—') + '</b>').join('') + '<span>Olla · qué es constante</span><b>' + (r.olla_const ? (r.olla_const === 'vn' ? 'V y n ✓' : '✗') : '—') + '</b><span>Llanta · ¿sacar aire?</span><b>' + (r.llanta_sacar ? (r.llanta_sacar === 'no' ? 'No ✓' : 'Sí ✗') : '—') + '</b></div>' +
+    ans(r.olla_tcm, 'Olla · explicación') + ans(r.llanta_por, 'Llanta · explicación') + ans(r.airbag_av, 'Airbag · Avogadro') +
+    '<h4>Prueba</h4>' + ((e.prueba || []).length ? '<div class="kv">' + e.prueba.map(p => '<span>' + esc((P[p.pregunta] || {}).enunciado || p.pregunta).slice(0, 70) + '…</span><b>' + 'ABCD'[p.elegida] + ' ' + (p.correcta ? '<span class="ok">✓</span>' : '<span class="no">✗</span>') + '</b>').join('') + '</div>' : '<p class="empty">No ha presentado la prueba.</p>');
+}
+$('#csv').onclick = () => {
+  if (!DATA) return; const L = list(TAB), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  let rows;
+  if (TAB === 'reto'){ const K = ['sabemos','necesitamos','cambian','prediccion','prediccion_por','tcm1','tcm2','revienta2','evalua_pred','revienta3','solucion','a_entendi','a_calculos','a_explico','mejorar'];
+    rows = [['curso','nombre','estado','pasos','v1','v1_ok','v2','v2_ok','v3','v3_ok', ...K, 'actualizado']].concat(L.map(e => { const R = e.respuestas || {}, c = R.checks || {}, r = R.r || {}; return [e.curso, e.nombre, e.completado ? 'enviado' : 'en curso', R.pasos || 0, ...['v1','v2','v3'].flatMap(k => [c[k] ? c[k].ultimo : '', c[k] ? (c[k].ok ? 'si' : 'no') : '']), ...K.map(k => r[k]), e.actualizado]; })); }
+  else { const K = ['olla_const','olla_tcm','llanta_sacar','llanta_por','airbag_av'];
+    rows = [['curso','nombre','casos', ...CQ.flatMap(x => [x[0], x[0] + '_ok']), ...K, 'prueba_correctas', 'prueba_respondidas', ...DATA.preguntas.map(p => p.codigo), 'actualizado']].concat(L.map(e => { const R = e.respuestas || {}, c = R.checks || {}, r = R.r || {}, P = Object.fromEntries((e.prueba || []).map(p => [p.pregunta, p])); return [e.curso, e.nombre, (R.casos || []).length, ...CQ.flatMap(x => [c[x[0]] ? c[x[0]].ultimo : '', c[x[0]] ? (c[x[0]].ok ? 'si' : 'no') : '']), ...K.map(k => r[k]), (e.prueba || []).filter(p => p.correcta).length, (e.prueba || []).length, ...DATA.preguntas.map(p => P[p.codigo] ? 'ABCD'[P[p.codigo].elegida] + (P[p.codigo].correcta ? ' ✓' : ' ✗') : ''), e.actualizado]; })); }
+  const blob = new Blob(['﻿' + rows.map(r => r.map(q).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (TAB === 'reto' ? 'situacion-problema' : 'estudio-casos') + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+setTimeout(() => $('#pw').focus(), 50);
+})();
+</script>
+</body>
+</html>

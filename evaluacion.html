@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Entregables y rúbricas · Química General 10.°</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1315'/%3E%3Ccircle cx='10' cy='11' r='3.2' fill='%23ffd23f'/%3E%3Ccircle cx='21' cy='9' r='2.4' fill='%236cc4ff'/%3E%3Ccircle cx='16' cy='20' r='3' fill='%236cc4ff'/%3E%3Ccircle cx='24' cy='22' r='2.2' fill='%23ffd23f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Evaluación: tabla resumen por semana + tarjetas de cada entregable */
+main{max-width:900px}
+.intro{padding:32px 0 10px}
+.intro h1{font-size:clamp(30px,5vw,44px);margin-top:8px}
+.intro p.lead{color:var(--muted);margin-top:10px;font-size:17px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin-top:18px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.w{font-family:var(--f-mono);color:var(--accent);white-space:nowrap}
+.items{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.item{display:flex;flex-direction:column;gap:10px}
+.item .hd{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.item h2{font-size:22px}
+.item ul,.item ol{margin:0;padding-left:20px;font-size:15px;display:flex;flex-direction:column;gap:3px}
+.weights{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.weights div{background:var(--panel2);border-radius:10px;padding:10px;text-align:center}
+.weights b{display:block;font-family:var(--f-display);font-size:26px;color:var(--accent)}
+.weights span{font-size:13.5px;color:var(--muted)}
+@media (max-width:520px){.weights{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1b2629"/><circle cx="10" cy="11" r="3.2" fill="#ffd23f"/><circle cx="21" cy="9" r="2.4" fill="#6cc4ff"/><circle cx="16" cy="20" r="3" fill="#6cc4ff"/><circle cx="24" cy="22" r="2.2" fill="#ffd23f"/></svg><span>Química General 10.°</span></a>
+  <nav class="nav" aria-label="Secciones"><a href="./#ruta">Ruta</a><a href="./#laboratorios">Laboratorios</a><a href="evaluacion.html" aria-current="page">Evaluación</a></nav>
+  <button class="who" id="who" type="button">Identifícate</button>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <p class="eyebrow">Evaluación de los aprendizajes</p>
+    <h1>Entregables y rúbricas</h1>
+    <p class="lead">Todo lo que entregas en la unidad, cuándo y con qué se evalúa.</p>
+  </section>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Semana</th><th>Momento</th><th>Entregable</th><th>Modalidad</th></tr></thead>
+    <tbody>
+      <tr><td class="w">1 · 2</td><td>Clases magistrales y simuladores</td><td>Apuntes, tablas, gráficas y explicaciones en el cuaderno</td><td>Individual</td></tr>
+      <tr><td class="w">1</td><td>Situación problema</td><td><a href="reto.html">Formulario digital del reto</a></td><td>Individual</td></tr>
+      <tr><td class="w">1</td><td>Laboratorio #1</td><td>Preinforme e informe de práctica</td><td>Grupal</td></tr>
+      <tr><td class="w">2</td><td>Estudio de casos</td><td><a href="casos.html#prueba">Prueba de selección múltiple</a></td><td>Individual</td></tr>
+      <tr><td class="w">2</td><td>Laboratorio #2</td><td>Videoresumen e informe de práctica</td><td>Grupal</td></tr>
+      <tr><td class="w">3</td><td>Clase invertida</td><td>Cartelera digital e impresa</td><td>Grupal</td></tr>
+      <tr><td class="w">3</td><td>Trivia</td><td>Cuestionario de trivia</td><td>Individual</td></tr>
+      <tr><td class="w">3</td><td>Laboratorio #3</td><td>Infografía e informe de práctica</td><td>Grupal</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="items">
+    <article class="card item" id="preinforme"><div class="hd"><h2>Preinforme</h2><span class="chip">Laboratorios 1, 2 y 3 · al terminar la práctica</span></div>
+      <p>Escrito a mano y en grupo. Debe tener:</p>
+      <ul><li>Integrantes</li><li>Título</li><li>Objetivo general</li><li>Hipótesis</li><li>Diagrama de flujo</li><li>Resultados preliminares</li></ul></article>
+
+    <article class="card item" id="informe"><div class="hd"><h2>Informe de práctica</h2><span class="chip">7 días después de cada laboratorio</span></div>
+      <p>Digital y en grupo, con estas secciones:</p>
+      <ol><li>Portada</li><li>Introducción</li><li>Teoría relacionada</li><li>Objetivos</li><li>Materiales</li><li>Resultados y discusión</li><li>Conclusión</li><li>Evaluación</li><li>Autoevaluación</li><li>Bibliografía</li><li>Anexos</li></ol></article>
+
+    <article class="card item" id="video"><div class="hd"><h2>Videoresumen</h2><span class="chip">Laboratorio #2</span></div>
+      <ul><li>Duración máxima de 2 minutos.</li><li>Imágenes reales de los materiales del laboratorio que usaron.</li><li>Audios originales de los integrantes del grupo.</li></ul>
+      <div class="btnrow"><a class="btn sm" data-link="rubricaVideo"><span class="lbl" data-pronto="Rúbrica completa · pronto">Ver rúbrica completa</span></a><a class="btn sm" data-link="entregas"><span class="lbl" data-pronto="Enviar · pronto">Enviar</span></a></div></article>
+
+    <article class="card item" id="carteleras"><div class="hd"><h2>Cartelera</h2><span class="chip">Semana 3 · clase invertida</span></div>
+      <p>Grupal, de 100 × 90 cm, en versión digital (se envía antes) e impresa (se instala y se expone en clase). Se califica con cuatro criterios:</p>
+      <div class="weights"><div><b>10 %</b><span>Estilo</span></div><div><b>35 %</b><span>Contenido</span></div><div><b>45 %</b><span>Creatividad</span></div><div><b>10 %</b><span>Balance</span></div></div>
+      <div class="btnrow"><a class="btn sm" data-link="rubricaCarteleras"><span class="lbl" data-pronto="Rúbrica completa · pronto">Ver rúbrica completa</span></a><a class="btn sm" data-link="entregas"><span class="lbl" data-pronto="Enviar · pronto">Enviar diseño digital</span></a></div></article>
+
+    <article class="card item" id="infografia"><div class="hd"><h2>Infografía</h2><span class="chip">Laboratorio #3</span></div>
+      <ul><li>Imágenes reales de los materiales del laboratorio que usaron.</li><li>Los pasos del método científico aplicados en la práctica.</li></ul>
+      <div class="btnrow"><a class="btn sm" data-link="rubricaInfografia"><span class="lbl" data-pronto="Rúbrica completa · pronto">Ver rúbrica completa</span></a><a class="btn sm" data-link="entregas"><span class="lbl" data-pronto="Enviar · pronto">Enviar</span></a></div></article>
+  </div>
+</main>
+<footer class="foot"><div class="wrap"><span>IE Juan XXIII · Química General 10.°</span><span><a href="docente.html">Acceso docente</a></span></div></footer>
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+</body>
+</html>

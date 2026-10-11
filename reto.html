@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Situación problema · El paseo al páramo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1315'/%3E%3Ccircle cx='10' cy='11' r='3.2' fill='%23ffd23f'/%3E%3Ccircle cx='21' cy='9' r='2.4' fill='%236cc4ff'/%3E%3Ccircle cx='16' cy='20' r='3' fill='%236cc4ff'/%3E%3Ccircle cx='24' cy='22' r='2.2' fill='%23ffd23f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Reto: columna de pasos numerados; barra de progreso y estado de guardado fijos arriba */
+main{max-width:780px}
+.intro{padding:32px 0 8px;display:flex;flex-direction:column;gap:12px}
+.intro h1{font-size:clamp(30px,5vw,44px)}
+.intro .lead{color:var(--muted);font-size:17px}
+.prog{position:sticky;top:58px;z-index:10;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--muted)}
+.prog .bar{flex:1;height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.story{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.place{display:flex;flex-direction:column;gap:6px}
+.place h3{font-size:18px}
+.place dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px}
+.place dt{color:var(--muted)}
+.place dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+@media (max-width:600px){.story{grid-template-columns:1fr}}
+.step{margin-top:22px;display:flex;flex-direction:column;gap:14px}
+.step .sh{display:flex;gap:12px;align-items:flex-start}
+.step .num{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;border:1px solid var(--line2);color:var(--accent)}
+.step.done .num{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.step h2{font-size:21px}
+.step .sub{font-size:14px;color:var(--muted);margin-top:2px}
+.calc{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.calc label.f{flex:1 1 200px}
+.unit{position:relative}
+.unit input{padding-right:52px;font-family:var(--f-mono)}
+.unit span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-family:var(--f-mono);font-size:14px}
+.formula{font-family:var(--f-mono);font-size:15px;background:var(--panel2);border-radius:8px;padding:8px 12px;display:inline-block}
+.opts{display:flex;flex-direction:column;gap:8px}
+.likert{display:grid;grid-template-columns:minmax(0,1fr) repeat(4,auto);gap:8px 6px;align-items:center;font-size:14.5px}
+.likert .h{font-size:12px;color:var(--muted);text-align:center;width:64px}
+.likert input{width:auto;accent-color:var(--accent);justify-self:center}
+.save{font-size:13px;color:var(--muted);white-space:nowrap}
+.done-box{margin-top:26px;text-align:left}
+.done-box[hidden]{display:none}
+@media (max-width:520px){.likert{grid-template-columns:minmax(0,1fr) repeat(4,34px)}.likert .h{width:34px;font-size:10.5px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1b2629"/><circle cx="10" cy="11" r="3.2" fill="#ffd23f"/><circle cx="21" cy="9" r="2.4" fill="#6cc4ff"/><circle cx="16" cy="20" r="3" fill="#6cc4ff"/><circle cx="24" cy="22" r="2.2" fill="#ffd23f"/></svg><span>Química General 10.°</span></a>
+  <nav class="nav" aria-label="Secciones"><a href="./#semana-1">← Semana 1</a></nav>
+  <button class="who" id="who" type="button">Identifícate</button>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <p class="eyebrow">Semana 1 · Momento 3 · Aprendizaje basado en problemas</p>
+    <h1>El paseo al páramo</h1>
+    <p class="lead">Una familia sale en bus desde Cartagena hacia un páramo de la cordillera, a más de 3 000 metros de altura. En la maleta llevan un paquete sellado de papas fritas. La empresa que los fabrica recibe quejas: algunos paquetes llegan reventados a la montaña y otros no. Tu misión es averiguar por qué y proponer una solución.</p>
+  </section>
+
+  <div class="prog" aria-live="polite"><span id="progTxt">0 de 8 pasos</span><span class="bar"><i id="progBar"></i></span><span class="save" id="saveTxt">Sin guardar</span></div>
+
+  <section class="story" style="margin-top:18px">
+    <div class="card place"><p class="eyebrow">Salida</p><h3>Cartagena · nivel del mar</h3><dl><dt>Presión del aire</dt><dd>1,00 atm</dd><dt>Temperatura</dt><dd>30 °C</dd><dt>Aire en el paquete</dt><dd>400 mL</dd></dl></div>
+    <div class="card place"><p class="eyebrow">Llegada al amanecer</p><h3>Páramo · 3 000 m</h3><dl><dt>Presión del aire</dt><dd>0,72 atm</dd><dt>Temperatura</dt><dd>9 °C</dd><dt>El paquete revienta si supera</dt><dd>520 mL</dd></dl></div>
+  </section>
+  <p class="note" style="margin-top:10px">Supón que el aire del paquete se comporta como un gas ideal, que no se escapa y que su presión es igual a la del aire de afuera.</p>
+
+  <form id="reto" novalidate>
+  <section class="step" data-s="1"><div class="sh"><span class="num">1</span><div><h2>Comprende el problema</h2><p class="sub">Antes de calcular, organiza la información.</p></div></div>
+    <label class="f">¿Qué datos conoces?<textarea name="sabemos" placeholder="Ej.: la presión en Cartagena es…"></textarea></label>
+    <label class="f">¿Qué necesitas averiguar?<textarea name="necesitamos" style="min-height:70px"></textarea></label>
+    <fieldset class="opts" style="border:0;padding:0;margin:0"><legend class="note" style="margin-bottom:8px">Durante el viaje, ¿qué propiedades del aire del paquete cambian?</legend>
+      <label class="opt"><input type="radio" name="cambian" value="P">Solo la presión</label>
+      <label class="opt"><input type="radio" name="cambian" value="T">Solo la temperatura</label>
+      <label class="opt"><input type="radio" name="cambian" value="PT">La presión y la temperatura</label>
+      <label class="opt"><input type="radio" name="cambian" value="n">La cantidad de aire</label>
+    </fieldset>
+    <div class="fb" id="fb-cambian" hidden></div>
+  </section>
+
+  <section class="step" data-s="2"><div class="sh"><span class="num">2</span><div><h2>Haz tu predicción</h2><p class="sub">Sin hacer cálculos todavía. No importa si te equivocas: al final la vas a evaluar.</p></div></div>
+    <fieldset class="opts" style="border:0;padding:0;margin:0"><legend class="note" style="margin-bottom:8px">¿El paquete llega reventado al páramo al amanecer?</legend>
+      <label class="opt"><input type="radio" name="prediccion" value="si">Sí, revienta</label>
+      <label class="opt"><input type="radio" name="prediccion" value="no">No, llega entero</label>
+      <label class="opt"><input type="radio" name="prediccion" value="nose">No se puede saber sin calcular</label>
+    </fieldset>
+    <label class="f">¿Por qué lo crees?<textarea name="prediccion_por" style="min-height:70px"></textarea></label>
+  </section>
+
+  <section class="step" data-s="3"><div class="sh"><span class="num">3</span><div><h2>Primero, solo la presión</h2><p class="sub">Ley de Boyle: imagina que la temperatura se mantiene en 30 °C y solo baja la presión de 1,00 atm a 0,72 atm.</p></div></div>
+    <span class="formula">P₁ · V₁ = P₂ · V₂</span>
+    <div class="calc"><label class="f">Volumen del aire del paquete en el páramo, V₂<span class="unit"><input name="v1" inputmode="decimal" autocomplete="off" placeholder="0,0"><span>mL</span></span></label><button type="button" class="btn" data-check="v1">Comprobar</button></div>
+    <div class="fb" id="fb-v1" hidden></div>
+    <label class="f">Con la teoría cinético-molecular, explica por qué el volumen cambia así cuando baja la presión exterior.<textarea name="tcm1"></textarea></label>
+  </section>
+
+  <section class="step" data-s="4"><div class="sh"><span class="num">4</span><div><h2>Ahora, el frío del páramo</h2><p class="sub">Ley de Charles: a presión constante de 0,72 atm, el aire se enfría de 30 °C a 9 °C. Parte del volumen que calculaste en el paso 3.</p></div></div>
+    <span class="formula">V₁ / T₁ = V₂ / T₂ &nbsp;·&nbsp; T(K) = T(°C) + 273,15</span>
+    <div class="calc"><label class="f">Volumen final al amanecer<span class="unit"><input name="v2" inputmode="decimal" autocomplete="off" placeholder="0,0"><span>mL</span></span></label><button type="button" class="btn" data-check="v2">Comprobar</button></div>
+    <div class="fb" id="fb-v2" hidden></div>
+    <label class="f">Explica con la teoría cinético-molecular qué les pasa a las partículas del aire cuando se enfrían.<textarea name="tcm2"></textarea></label>
+  </section>
+
+  <section class="step" data-s="5"><div class="sh"><span class="num">5</span><div><h2>Evalúa tu predicción</h2><p class="sub">Compara el resultado con lo que predijiste en el paso 2.</p></div></div>
+    <fieldset class="opts" style="border:0;padding:0;margin:0"><legend class="note" style="margin-bottom:8px">Según tus cálculos, ¿el paquete revienta al amanecer?</legend>
+      <label class="opt"><input type="radio" name="revienta2" value="si">Sí, revienta</label>
+      <label class="opt"><input type="radio" name="revienta2" value="no">No, llega entero</label>
+    </fieldset>
+    <div class="fb" id="fb-revienta2" hidden></div>
+    <label class="f">¿Acertaste? ¿Qué no tuviste en cuenta al predecir?<textarea name="evalua_pred" style="min-height:70px"></textarea></label>
+  </section>
+
+  <section class="step" data-s="6"><div class="sh"><span class="num">6</span><div><h2>Cambia el escenario</h2><p class="sub">Otro bus llega al páramo al mediodía, cuando la temperatura es de 25 °C. La presión sigue siendo 0,72 atm.</p></div></div>
+    <div class="calc"><label class="f">Volumen del aire del paquete al mediodía<span class="unit"><input name="v3" inputmode="decimal" autocomplete="off" placeholder="0,0"><span>mL</span></span></label><button type="button" class="btn" data-check="v3">Comprobar</button></div>
+    <div class="fb" id="fb-v3" hidden></div>
+    <fieldset class="opts" style="border:0;padding:0;margin:0"><legend class="note" style="margin-bottom:8px">¿Este paquete revienta?</legend>
+      <label class="opt"><input type="radio" name="revienta3" value="si">Sí, revienta</label>
+      <label class="opt"><input type="radio" name="revienta3" value="no">No, llega entero</label>
+    </fieldset>
+    <div class="fb" id="fb-revienta3" hidden></div>
+  </section>
+
+  <section class="step" data-s="7"><div class="sh"><span class="num">7</span><div><h2>Propón una solución</h2><p class="sub">Escríbele a la empresa: ¿qué puede cambiar para que ningún paquete reviente en la montaña, sin importar la hora? Usa las leyes de los gases para justificarlo.</p></div></div>
+    <label class="f">Tu propuesta<textarea name="solucion" style="min-height:130px"></textarea></label>
+  </section>
+
+  <section class="step" data-s="8"><div class="sh"><span class="num">8</span><div><h2>Revisa tu trabajo</h2><p class="sub">Sé honesto: esto ayuda al profesor a darte realimentación.</p></div></div>
+    <div class="likert" role="group" aria-label="Autoevaluación">
+      <span></span><span class="h">Nada</span><span class="h">Poco</span><span class="h">Bien</span><span class="h">Muy bien</span>
+      <span>Entendí qué pedía el problema</span><input type="radio" name="a_entendi" value="1" aria-label="Nada"><input type="radio" name="a_entendi" value="2" aria-label="Poco"><input type="radio" name="a_entendi" value="3" aria-label="Bien"><input type="radio" name="a_entendi" value="4" aria-label="Muy bien">
+      <span>Hice los cálculos sin ayuda</span><input type="radio" name="a_calculos" value="1" aria-label="Nada"><input type="radio" name="a_calculos" value="2" aria-label="Poco"><input type="radio" name="a_calculos" value="3" aria-label="Bien"><input type="radio" name="a_calculos" value="4" aria-label="Muy bien">
+      <span>Puedo explicar el resultado con la teoría cinético-molecular</span><input type="radio" name="a_explico" value="1" aria-label="Nada"><input type="radio" name="a_explico" value="2" aria-label="Poco"><input type="radio" name="a_explico" value="3" aria-label="Bien"><input type="radio" name="a_explico" value="4" aria-label="Muy bien">
+    </div>
+    <label class="f">¿Qué harías distinto la próxima vez?<textarea name="mejorar" style="min-height:70px"></textarea></label>
+    <div class="btnrow"><button class="btn pri" type="submit" id="enviar">Enviar al profesor</button><span class="note" id="envMsg" role="status"></span></div>
+  </section>
+  </form>
+
+  <section class="card done-box" id="done" hidden>
+    <h2 style="font-size:24px">¡Reto enviado!</h2>
+    <p style="margin-top:8px">Tu profesor revisará tus respuestas y dejará la realimentación en tu carpeta de Drive. Puedes volver a esta página para corregir algo: los cambios se guardan solos.</p>
+    <div class="btnrow" style="margin-top:14px"><a class="btn" data-link="carpetaDrive"><span class="lbl" data-pronto="Carpeta de Drive · pronto">Abrir mi carpeta de Drive</span></a><a class="btn" href="./#semana-1">Volver a la semana 1</a></div>
+  </section>
+</main>
+<footer class="foot"><div class="wrap"><span>IE Juan XXIII · Química General 10.°</span><span>Tus respuestas se guardan en este dispositivo y en la base del curso.</span></div></footer>
+
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+<script>
+(function(){
+const { $, store, uuid, rpc, asegurarIdentidad, quien } = QG;
+const F = $('#reto');
+let DKEY, EKEY;
+const num = s => { if (s == null) return NaN; s = String(s).trim().replace(/\s/g, ''); if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, ''); return parseFloat(s.replace(',', '.')); };
+const near = (x, y, tol) => Math.abs(x - y) <= Math.abs(y) * tol;
+const fmt = n => n.toLocaleString('es-CO', { maximumFractionDigits: 1 });
+let D = { r:{}, checks:{} }, envio = null, dirty = false, timer = null;
+
+/* respuestas esperadas */
+const V1 = 400 * 1.00 / 0.72, V2 = V1 * 282.15 / 303.15, V3 = V1 * 298.15 / 303.15;
+const CHECK = {
+  v1: x => near(x, V1, .015) ? ['ok', '<b>Correcto.</b> V₂ = (1,00 atm × 400 mL) / 0,72 atm ≈ ' + fmt(V1) + ' mL. Si solo cambiara la presión, el paquete pasaría de 520 mL…']
+    : near(x, 400 * .72, .02) ? ['bad', '<b>Revisa la relación.</b> Al bajar la presión de afuera, el gas se expande: V₂ debe ser mayor que 400 mL. Despeja V₂ = P₁·V₁ / P₂.']
+    : near(x, 400, .01) ? ['bad', '<b>No es 400 mL.</b> La presión cambió, así que el volumen también cambia.']
+    : ['warn', '<b>Todavía no.</b> Despeja V₂ de P₁·V₁ = P₂·V₂ y revisa tus operaciones.'],
+  v2: x => near(x, V2, .015) ? ['ok', '<b>Correcto.</b> V₂ = ' + fmt(V1) + ' mL × 282,15 K / 303,15 K ≈ ' + fmt(V2) + ' mL.']
+    : near(x, V1 * 9 / 30, .03) ? ['bad', '<b>Usaste grados Celsius.</b> En las leyes de los gases la temperatura va en kelvin: 9 °C = 282,15 K y 30 °C = 303,15 K.']
+    : near(x, V1 * 303.15 / 282.15, .015) ? ['bad', '<b>Invertiste la razón de temperaturas.</b> Al enfriarse, el gas se contrae: el volumen debe disminuir.']
+    : near(x, 400 * 282.15 / 303.15, .015) ? ['warn', '<b>Partiste de 400 mL.</b> Debes partir del volumen que obtuviste en el paso 3, porque la presión ya cambió.']
+    : ['warn', '<b>Todavía no.</b> Convierte las temperaturas a kelvin y usa el volumen del paso 3 como V₁.'],
+  v3: x => near(x, V3, .015) ? ['ok', '<b>Correcto.</b> V = ' + fmt(V1) + ' mL × 298,15 K / 303,15 K ≈ ' + fmt(V3) + ' mL.']
+    : near(x, V1 * 25 / 30, .03) ? ['bad', '<b>Usaste grados Celsius.</b> Convierte: 25 °C = 298,15 K.']
+    : ['warn', '<b>Todavía no.</b> Repite el procedimiento del paso 4, ahora con 25 °C.']
+};
+const RADIO_FB = {
+  cambian: v => v === 'PT' ? ['ok', 'Así es: al subir a la montaña cambian la presión y la temperatura. Por eso vas a resolverlo en dos pasos, uno con cada ley.'] : ['warn', 'Mira otra vez la tabla: compara la presión y la temperatura de la salida y de la llegada. El paquete está sellado, así que la cantidad de aire no cambia.'],
+  revienta2: v => v === 'no' ? ['ok', 'Correcto: ' + fmt(V2) + ' mL es menor que 520 mL. El frío compensa casi toda la expansión por la baja presión. ¡Por muy poco!'] : ['warn', 'Compara tu volumen final del paso 4 con el límite de 520 mL.'],
+  revienta3: v => v === 'si' ? ['ok', 'Correcto: ' + fmt(V3) + ' mL supera los 520 mL. A la misma altura, la hora de llegada decide si el paquete revienta.'] : ['warn', 'Compara el volumen al mediodía con el límite de 520 mL.']
+};
+
+function showFb(id, r){ const el = $('#fb-' + id); if (!el) return; el.hidden = !r; if (r){ el.className = 'fb ' + r[0]; el.innerHTML = r[1]; } }
+function doCheck(k){
+  const x = num(F.elements[k].value);
+  if (isNaN(x)){ showFb(k, ['warn', 'Escribe un número.']); return; }
+  const r = CHECK[k](x); showFb(k, r);
+  const c = D.checks[k] || { intentos: 0, ok: false }; c.intentos++; c.ok = c.ok || r[0] === 'ok'; c.ultimo = x; D.checks[k] = c;
+  dirty = true; persist(true);
+}
+function collect(){
+  const r = {};
+  for (const el of F.elements){ if (!el.name) continue; if (el.type === 'radio'){ if (el.checked) r[el.name] = el.value; } else r[el.name] = el.value; }
+  return r;
+}
+function fill(){
+  for (const el of F.elements){ if (!el.name || D.r[el.name] == null) continue; if (el.type === 'radio') el.checked = D.r[el.name] === el.value; else el.value = D.r[el.name]; }
+  Object.keys(D.checks).forEach(k => { if (D.checks[k].ultimo != null && CHECK[k]) showFb(k, CHECK[k](D.checks[k].ultimo)); });
+  Object.keys(RADIO_FB).forEach(k => { if (D.r[k]) showFb(k, RADIO_FB[k](D.r[k])); });
+}
+function progress(){
+  const r = D.r, ch = D.checks, ok = k => ch[k] && ch[k].ok;
+  const done = [ (r.sabemos||'').trim() && r.cambian, r.prediccion && (r.prediccion_por||'').trim(), ok('v1') && (r.tcm1||'').trim(), ok('v2') && (r.tcm2||'').trim(), r.revienta2 && (r.evalua_pred||'').trim(), ok('v3') && r.revienta3, (r.solucion||'').trim().length > 20, r.a_entendi && r.a_calculos && r.a_explico ];
+  document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('done', !!done[i]));
+  const n = done.filter(Boolean).length; $('#progTxt').textContent = n + ' de 8 pasos'; $('#progBar').style.width = (n / 8 * 100) + '%';
+  return n;
+}
+async function persist(remote){
+  D.r = collect(); D.t = Date.now(); store.set(DKEY, D); progress();
+  if (!remote) return;
+  const q = quien(); if (!q) return;
+  if (!envio){ envio = uuid(); store.set(EKEY, envio); }
+  $('#saveTxt').textContent = 'Guardando…';
+  try {
+    await rpc('app_guardar', { p_id: envio, p_app: 'reto', p_estudiante: q.estudiante_id, p_nombre: q.nombre, p_curso: q.curso, p_respuestas: { r: D.r, checks: D.checks, pasos: progress() }, p_completado: !!D.enviado, p_agente: navigator.userAgent });
+    dirty = false; $('#saveTxt').textContent = 'Guardado ' + new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+  } catch(e){ $('#saveTxt').textContent = 'Sin conexión: guardado en este dispositivo'; }
+}
+F.addEventListener('input', () => { dirty = true; persist(false); clearTimeout(timer); timer = setTimeout(() => persist(true), 4000); });
+F.addEventListener('change', e => { const n = e.target.name; if (RADIO_FB[n]){ persist(false); showFb(n, RADIO_FB[n](e.target.value)); persist(true); } });
+document.querySelectorAll('[data-check]').forEach(b => b.onclick = () => doCheck(b.dataset.check));
+['v1','v2','v3'].forEach(k => F.elements[k].addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); doCheck(k); } }));
+F.onsubmit = async e => {
+  e.preventDefault();
+  const n = progress(), m = $('#envMsg');
+  if (n < 8){ const falt = [...document.querySelectorAll('.step:not(.done) .num')].map(x => x.textContent); m.textContent = 'Te falta completar: paso' + (falt.length > 1 ? 's ' : ' ') + falt.join(', ') + '.'; return; }
+  D.enviado = true; $('#enviar').disabled = true; m.textContent = 'Enviando…';
+  await persist(true);
+  if (dirty){ m.textContent = 'No hay conexión. Tus respuestas están guardadas en este dispositivo; vuelve a pulsar Enviar cuando tengas internet.'; $('#enviar').disabled = false; D.enviado = false; return; }
+  m.textContent = ''; $('#done').hidden = false; $('#done').scrollIntoView({ behavior: 'smooth' }); $('#enviar').disabled = false;
+};
+addEventListener('pagehide', () => { if (dirty) persist(true); });
+addEventListener('online', () => { if (dirty) persist(true); });
+
+addEventListener('qg:identidad', () => location.reload());
+asegurarIdentidad().then(q => {
+  const k = QG.claveDe(q); DKEY = 'qg_reto_borrador_' + k; EKEY = 'qg_reto_envio_' + k;
+  D = store.get(DKEY) || { r:{}, checks:{} }; envio = store.get(EKEY);
+  fill(); progress();
+  if (D.enviado) $('#done').hidden = false;
+  if (D.t) persist(true);
+});
+})();
+</script>
+</body>
+</html>
