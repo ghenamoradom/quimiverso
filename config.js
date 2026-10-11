@@ -4,6 +4,10 @@
   Deja "" (comillas vacías) en lo que aún no tengas: el sitio mostrará "Disponible pronto".
 */
 window.CURSO = {
+  // MODO DE VALIDACIÓN (provisional): «Ingresar» entra directo con el usuario demo, que tiene todo desbloqueado.
+  // Para que los estudiantes ingresen con su curso y contraseña, cambia true por false.
+  modoValidacion: true,
+
   // Diapositivas de cada semana (PDF en la carpeta recursos/)
   diapositivas1: "recursos/semana-1-boyle-charles.pdf",          // Semana 1 · gas ideal, presión, Boyle y Charles
   diapositivas2: "recursos/semana-2-gay-lussac-avogadro.pdf",    // Semana 2 · Gay-Lussac, Avogadro, combinada y PV = nRT

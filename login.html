@@ -49,6 +49,17 @@ body{background:#fff}
   const { $, esc, rpc, sesion, guardarSesion } = QG;
   const next = (() => { const n = new URLSearchParams(location.search).get('next') || 'temas.html'; return /^[a-z0-9_\-]+\.html([?#].*)?$|^laboratorios\//i.test(n) ? n : 'temas.html'; })();
   if (sesion()){ location.replace(next); return; }
+  const params = new URLSearchParams(location.search);
+  if (window.CURSO && CURSO.modoValidacion && !params.has('normal')){
+    // Provisional: ingreso directo con el usuario demo mientras se valida la app
+    $('#f').hidden = true; document.querySelector('.lbox h1').textContent = 'Entrando con el usuario demo…';
+    document.querySelector('.lbox .note').innerHTML = 'Modo de validación activo. <a href="login.html?normal=1">Ingresar con mi curso y contraseña</a>';
+    rpc('login', { p_curso: 'Demo', p_clave: '1234' }).then(r => {
+      if (!r || r.error) throw new Error('demo');
+      guardarSesion({ token: r.token, id: r.id, nombre: r.nombre, curso: r.curso }); location.replace(next);
+    }).catch(() => { document.querySelector('.lbox h1').textContent = 'Ingresa a tu curso'; $('#f').hidden = false; $('#msg').textContent = 'No se pudo entrar con el usuario demo. Revisa tu conexión.'; });
+    return;
+  }
   const cursos = (window.CURSO && CURSO.cursos) || [];
   $('#curso').innerHTML = '<option value="">Elige tu curso</option>' + cursos.map(c => '<option>' + esc(c) + '</option>').join('') + '<option value="Demo">Demo</option>';
   $('#ver').onclick = () => { const i = $('#clave'), v = i.type === 'password'; i.type = v ? 'text' : 'password'; $('#ver').textContent = v ? 'Ocultar' : 'Mostrar'; $('#ver').setAttribute('aria-pressed', v); };

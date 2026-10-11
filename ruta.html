@@ -56,6 +56,22 @@
 .next .note{flex:1 1 220px}
 .endbox{border:1px solid var(--c1);background:#effaf9;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .endbox h2{font-size:22px}
+.pasos{display:flex;flex-direction:column;gap:12px;background:var(--panel2);border-radius:12px;padding:14px 16px}
+.pg h4{font-family:var(--f-display);font-size:15.5px;margin-bottom:6px}
+.pg ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:5px;font-size:15px}
+.drive{border:1px solid #bfe3df;background:#effaf9;border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.drive p{flex:1 1 280px;font-size:15px}
+.sv{background:#0f1720;border-radius:12px;overflow:hidden;outline:none}
+.sv:focus-visible{box-shadow:0 0 0 3px var(--c1)}
+.sv-stage{cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff}
+.sv-stage img{display:block;width:100%;height:auto;max-height:70vh;object-fit:contain}
+.sv-bar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#16202a;flex-wrap:wrap}
+.sv-bar .btn{background:#233140;border-color:#33465a;color:#fff}
+.sv-n{color:#cfd8e1;font-family:var(--f-mono);font-size:13px;min-width:64px;text-align:center}
+.sv-bar [data-sv=full]{margin-left:auto}
+.sv:fullscreen{display:flex;flex-direction:column;justify-content:center}
+.sv:fullscreen .sv-stage{flex:1;background:#000}
+.sv:fullscreen .sv-stage img{max-height:none;height:100%}
 @media (max-width:900px){
   .layout{grid-template-columns:minmax(0,1fr);gap:16px}
   .side{position:static;min-width:0}
@@ -96,9 +112,10 @@
   let hechas = new Set(), sid = new URLSearchParams(location.search).get('s') || '1-1', abiertas = new Set(), ocupado = false;
   if (!S.some(s => s.id === sid)) sid = '1-1';
 
+  const DEMO = (QG.sesion() || {}).curso === 'Demo';               // usuario de validación: todo desbloqueado
   const actual = () => A.find(a => !hechas.has(a.c)) || null;      // siguiente actividad pendiente
-  const estado = a => hechas.has(a.c) ? 'done' : (actual() && actual().c === a.c ? 'now' : 'lock');
-  const sesEstado = s => { const as = A.filter(a => a.s === s.id); if (as.every(a => hechas.has(a.c))) return 'done'; if (as.some(a => estado(a) === 'now')) return 'now'; return 'lock'; };
+  const estado = a => hechas.has(a.c) ? 'done' : (actual() && actual().c === a.c ? 'now' : (DEMO ? 'open' : 'lock'));
+  const sesEstado = s => { const as = A.filter(a => a.s === s.id); if (as.every(a => hechas.has(a.c))) return 'done'; if (DEMO || as.some(a => estado(a) === 'now')) return 'now'; return 'lock'; };
   const sesName = s => 'Semana ' + s.semana + ' · Sesión ' + s.n;
 
   function btn(r){
@@ -123,17 +140,23 @@
   function pintarMain(){
     const s = S.find(x => x.id === sid), as = A.filter(a => a.s === sid), cur = actual();
     let html = '<header class="shd"><p class="eyebrow">' + sesName(s) + ' · ' + esc(s.lugar) + ' · 2 horas</p><h1>' + esc(s.titulo) + '</h1><p>' + esc(s.desc) + '</p></header>';
+    if (DEMO) html += '<div class="banner" style="border-left-color:var(--c1)"><b>Modo de validación:</b> con el usuario demo todas las actividades están desbloqueadas y puedes recorrerlas en cualquier orden.</div>';
     if (sesEstado(s) === 'lock' && cur){
       const cs = S.find(x => x.id === cur.s);
       html += '<div class="banner">Esta sesión se desbloquea cuando completes las anteriores. Vas en <b>' + sesName(cs) + '</b>: «' + esc(cur.titulo) + '». <a href="ruta.html?s=' + cs.id + '" data-go="' + cs.id + '">Ir a esa actividad →</a></div>';
     }
     html += as.map((a, i) => {
       const st = estado(a), open = st === 'now' || abiertas.has(a.c);
-      const stTxt = st === 'done' ? 'Completada ✓' : st === 'now' ? 'Actividad actual' : 'Bloqueada';
+      const stTxt = st === 'done' ? 'Completada ✓' : st === 'now' ? 'Actividad actual' : st === 'open' ? 'Desbloqueada' : 'Bloqueada';
       let bd = '';
       if (open && st !== 'lock'){
-        bd = '<div class="bd"><p>' + esc(a.desc) + '</p><div class="btnrow">' + a.rec.map(btn).join('') + '</div><p class="ent"><b>Entregable:</b> ' + esc(a.ent) + '</p>' +
-          (st === 'now' ? '<div class="next"><p class="note">Cuando termines esta actividad, márcala para desbloquear la siguiente.</p><button class="btn pri" type="button" data-done="' + a.c + '">' + (A.indexOf(a) === A.length - 1 ? 'Completar y terminar el curso' : 'Completar y pasar a la siguiente actividad') + '</button></div>' : '') + '</div>';
+        bd = '<div class="bd"><p>' + esc(a.desc) + '</p>' + (a.slides ? visor(a.slides) : '') +
+          (a.pasos ? '<div class="pasos">' + a.pasos.map(g => '<div class="pg"><h4>' + esc(g.t) + '</h4><ol>' + g.items.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol></div>').join('') + '</div>' : '') +
+          (a.nota ? '<p class="note">' + esc(a.nota) + '</p>' : '') +
+          '<div class="btnrow">' + a.rec.map(btn).join('') + '</div>' +
+          (a.drive ? '<div class="drive"><p><b>Entrega en Drive.</b> ' + esc(a.drive) + '</p>' + btn(['Abrir mi carpeta de Drive', 'carpetaDrive', null, true]) + '</div>' : '') +
+          '<p class="ent"><b>Entregable:</b> ' + esc(a.ent) + '</p>' +
+          (st === 'now' || st === 'open' ? '<div class="next"><p class="note">' + (DEMO ? 'Márcala como completada cuando la hayas revisado.' : 'Cuando termines esta actividad, márcala para desbloquear la siguiente.') + '</p><button class="btn pri" type="button" data-done="' + a.c + '">' + (DEMO ? 'Marcar como completada' : A.indexOf(a) === A.length - 1 ? 'Completar y terminar el curso' : 'Completar y pasar a la siguiente actividad') + '</button></div>' : '') + '</div>';
       }
       return '<article class="act ' + st + '" id="a-' + a.c + '"><button class="h" type="button" data-t="' + a.c + '" aria-expanded="' + open + '"' + (st === 'lock' ? ' aria-disabled="true"' : '') + '>' +
         '<span class="k">' + (st === 'done' ? '✓' : st === 'lock' ? '🔒' : (i + 1)) + '</span><span><span class="h3">' + esc(a.titulo) + '</span><span class="tp">' + esc(a.tipo) + '</span></span><span class="st">' + stTxt + '</span></button>' + bd + '</article>';
@@ -143,10 +166,28 @@
       const ns = S.find(x => x.id === cur.s);
       html += '<div class="endbox"><h2>Sesión completada</h2><p>Sigue con ' + sesName(ns) + ': ' + esc(ns.titulo) + '.</p><div class="btnrow"><button class="btn pri" type="button" data-go="' + ns.id + '">Ir a la siguiente sesión</button></div></div>';
     }
-    const m = document.getElementById('main'); m.innerHTML = html; QG.enlaces(m);
+    const m = document.getElementById('main'); m.innerHTML = html; QG.enlaces(m); iniciarVisores(m);
     m.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const c = b.dataset.t, a = A.find(x => x.c === c); if (estado(a) === 'lock') return; if (abiertas.has(c)) abiertas.delete(c); else abiertas.add(c); pintarMain(); });
     m.querySelectorAll('[data-done]').forEach(b => b.onclick = () => completar(b.dataset.done, b));
     m.querySelectorAll('[data-go]').forEach(b => b.onclick = e => { e.preventDefault(); ir(b.dataset.go); });
+  }
+  /* ---------- visor de diapositivas ---------- */
+  const SRC = (d, i) => 'recursos/slides/' + d + '/s-' + String(i).padStart(2, '0') + '.jpg';
+  function visor(sl){
+    return '<div class="sv" data-deck="' + sl.deck + '" data-n="' + sl.n + '" tabindex="0" aria-label="Diapositivas: usa las flechas para avanzar">' +
+      '<div class="sv-stage"><img alt="Diapositiva 1 de ' + sl.n + '" src="' + SRC(sl.deck, 1) + '" width="1467" height="825"></div>' +
+      '<div class="sv-bar"><button type="button" class="btn sm" data-sv="-1" aria-label="Diapositiva anterior">←</button><span class="sv-n">1 / ' + sl.n + '</span><button type="button" class="btn sm" data-sv="1" aria-label="Diapositiva siguiente">→</button><button type="button" class="btn sm" data-sv="full">Pantalla completa</button></div></div>';
+  }
+  function iniciarVisores(root){
+    root.querySelectorAll('.sv').forEach(v => {
+      const d = v.dataset.deck, n = +v.dataset.n, img = v.querySelector('img'), lab = v.querySelector('.sv-n'); let i = 1;
+      const go = k => { i = Math.min(n, Math.max(1, i + k)); img.src = SRC(d, i); img.alt = 'Diapositiva ' + i + ' de ' + n; lab.textContent = i + ' / ' + n; if (i < n){ const pre = new Image(); pre.src = SRC(d, i + 1); } };
+      v.querySelectorAll('[data-sv]').forEach(b => b.onclick = () => { const k = b.dataset.sv; if (k === 'full'){ if (document.fullscreenElement) document.exitFullscreen(); else if (v.requestFullscreen) v.requestFullscreen(); } else go(+k); });
+      v.addEventListener('keydown', e => { if (e.key === 'ArrowRight'){ go(1); e.preventDefault(); } if (e.key === 'ArrowLeft'){ go(-1); e.preventDefault(); } });
+      let x0 = null; v.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+      v.addEventListener('touchend', e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); x0 = null; });
+      v.querySelector('.sv-stage').onclick = () => go(1);
+    });
   }
   function ir(id){ sid = id; abiertas.clear(); history.replaceState(null, '', 'ruta.html?s=' + id); pintarLado(); pintarMain(); scrollTo({ top: 0, behavior: 'smooth' }); }
   async function completar(c, b){

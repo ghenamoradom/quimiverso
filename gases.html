@@ -112,7 +112,7 @@ section.blk{padding:40px 0 4px}
     return '<article class="card wk" data-w="' + w.n + '"><div class="top2"><span class="eyebrow">Semana ' + w.n + '</span><span class="fx">' + esc(w.formula) + '</span></div>' +
       '<h3>' + esc(w.titulo) + '</h3><p class="leyes">' + esc(w.leyes) + '</p>' +
       ses.map(s => '<div class="ses"><b>Sesión ' + s.n + ' · ' + esc(s.lugar) + '<span>2 h</span></b><p>' + esc(s.desc) + '</p></div>').join('') +
-      '<div class="btnrow">' + ses.map(s => '<a class="btn sm' + (s.n === 1 ? ' pri' : '') + '" href="ruta.html?s=' + s.id + '">Sesión ' + s.n + '</a>').join('') + '</div></article>';
+      '</article>';
   }).join('');
   QG.progreso().then(p => {
     if (!p || p.error) return;

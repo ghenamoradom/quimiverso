@@ -68,3 +68,77 @@ window.GASES = {
       rec: [['Infografía', null, 'evaluacion.html#infografia'], ['Informe de práctica', null, 'evaluacion.html#informe']], ent: 'Infografía con los pasos del método científico e informe digital, en grupo.' }
   ]
 };
+
+/* ---------- Detalles: indicaciones, entregas en Drive y presentaciones ---------- */
+(function(){
+  const A = window.GASES.actividades, f = c => A.find(a => a.c === c);
+  const lab = (nombre, archivo) => ({
+    pasos: [{ t: 'Qué debes hacer', items: [
+      'Lee la guía de la práctica antes de entrar al laboratorio.',
+      'Haz la práctica virtual completa, anota tus datos en el cuaderno virtual y responde la evaluación.',
+      'Elabora el informe de la práctica con tus datos: portada, introducción, teoría relacionada, objetivos, materiales, resultados y discusión, conclusión, evaluación, autoevaluación, bibliografía y anexos.',
+      'Sube el informe a tu carpeta de Drive.'] }],
+    drive: 'Sube el informe de la práctica virtual de ' + nombre + ' a tu carpeta de Drive. Nombra el archivo así: Curso_Apellido_' + archivo + ' (por ejemplo, 10-1_Perez_' + archivo + ').',
+    ent: 'Informe de la práctica virtual, subido a tu carpeta de Drive.'
+  });
+
+  Object.assign(f('s1-clase'), { slides: { deck: 'semana-1-boyle-charles', n: 14 } });
+  Object.assign(f('s2-clase'), { slides: { deck: 'semana-2-gay-lussac-avogadro', n: 10 } });
+  Object.assign(f('s3-carteleras'), { slides: { deck: 'semana-3-dalton-graham', n: 9 } });
+
+  Object.assign(f('s1-phet'), {
+    desc: 'Explora el comportamiento de los gases en el simulador PhET «Propiedades de los gases». Sigue las indicaciones, toma datos, construye tablas y gráficas y explica lo que observas con la teoría cinético-molecular.',
+    pasos: [
+      { t: 'Parte A · Ley de Boyle (temperatura constante)', items: [
+        'Abre «Propiedades de los gases» y entra a la pantalla «Ideal».',
+        'Con la bomba, agrega partículas pesadas hasta tener unas 100 en la caja.',
+        'En «Mantener constante» elige «Temperatura».',
+        'Activa la herramienta «Ancho» para ver el ancho de la caja. Como la altura y la profundidad no cambian, el volumen es proporcional al ancho.',
+        'Arrastra la manija de la pared izquierda y fija cinco anchos distintos. En cada uno espera a que la presión se estabilice y anota el ancho y la presión del manómetro.'] },
+      { t: 'Parte B · Ley de Charles (presión constante)', items: [
+        'Reinicia la simulación y vuelve a agregar unas 100 partículas pesadas.',
+        'En «Mantener constante» elige la opción de presión constante, en la que cambia el volumen («Presión ↕ V»).',
+        'Con el control «Calor / Frío» cambia la temperatura en cinco pasos. En cada paso anota la temperatura en kelvin y el ancho de la caja.'] },
+      { t: 'Parte C · Explica lo que ves', items: [
+        'Observa cómo se mueven las partículas cuando comprimes la caja y cuando la calientas.',
+        'Escribe en el cuaderno qué les pasa a la velocidad de las partículas y a sus choques con las paredes en cada caso, usando la teoría cinético-molecular.'] },
+      { t: 'Tablas y gráficas', items: [
+        'Tabla A: ancho, presión y producto presión × ancho. Gráficas: presión contra ancho y presión contra 1/ancho.',
+        'Tabla B: temperatura (K) y ancho. Gráfica: ancho contra temperatura.',
+        'Puedes hacerlas en papel milimetrado y fotografiarlas, o en Excel o Google Sheets.'] }
+    ],
+    nota: 'Si «Propiedades de los gases» no carga, usa «Gases: introducción», pantalla «Leyes», que tiene las mismas opciones. Los nombres de los botones pueden variar un poco según la versión del simulador.',
+    drive: 'Sube a tu carpeta de Drive las tablas y las gráficas que elaboraste con los datos del simulador. Nombra el archivo así: Curso_Apellido_PhET (por ejemplo, 10-1_Perez_PhET).',
+    ent: 'Tablas y gráficas elaboradas con los datos del simulador, subidas a tu carpeta de Drive.'
+  });
+
+  Object.assign(f('s2-sim'), {
+    desc: 'Trabaja con el simulador de leyes de los gases de la Universidad de Texas (en inglés). Sigue las indicaciones, toma datos, construye tablas y gráficas y comprueba la ecuación de los gases ideales. Complementa con la simulación de la AACT.',
+    pasos: [
+      { t: 'Antes de empezar', items: [
+        'El simulador está en inglés: pressure = presión, volume = volumen, temperature = temperatura, moles = cantidad de sustancia, pump = bomba, release valve = válvula de escape.'] },
+      { t: 'Parte A · Ley de Gay-Lussac (volumen constante)', items: [
+        'Con la manija de la bomba agrega gas A y deja fija esa cantidad.',
+        'Bloquea el volumen (volume locked).',
+        'Sube la temperatura en cinco pasos. En cada uno anota la temperatura y la presión que muestra el simulador.'] },
+      { t: 'Parte B · Ley de Avogadro (presión y temperatura constantes)', items: [
+        'Libera el volumen para que el pistón se mueva y no cambies la temperatura.',
+        'Agrega gas con la bomba en cinco tandas. Después de cada una anota la cantidad de gas y el volumen.'] },
+      { t: 'Parte C · Comprueba PV = nRT', items: [
+        'Elige uno de tus datos y calcula la presión con P = nRT/V, usando R = 0,082 atm·L/(mol·K) o la constante que corresponda a las unidades del simulador.',
+        'Compara tu resultado con la presión que muestra el simulador y explica la diferencia, si la hay.'] },
+      { t: 'Tablas y gráficas', items: [
+        'Tabla A: temperatura (K) y presión. Gráfica: presión contra temperatura.',
+        'Tabla B: cantidad de gas y volumen. Gráfica: volumen contra cantidad de gas.',
+        'Después abre la simulación de la AACT y responde sus preguntas en el cuaderno.'] }
+    ],
+    drive: 'Sube a tu carpeta de Drive las tablas y las gráficas que elaboraste con los datos del simulador de la Universidad de Texas. Nombra el archivo así: Curso_Apellido_Texas (por ejemplo, 10-1_Perez_Texas).',
+    ent: 'Tablas y gráficas elaboradas con los datos del simulador, subidas a tu carpeta de Drive.'
+  });
+
+  Object.assign(f('s1-vboyle'), lab('Boyle', 'Lab-Boyle'));
+  Object.assign(f('s1-vcharles'), lab('Charles', 'Lab-Charles'));
+  Object.assign(f('s2-vavogadro'), lab('Avogadro', 'Lab-Avogadro'));
+  Object.assign(f('s3-vgraham'), lab('Graham', 'Lab-Graham'));
+  ['s1-vboyle', 's1-vcharles', 's2-vavogadro', 's3-vgraham'].forEach(c => f(c).rec.push(['Estructura del informe', null, 'evaluacion.html#informe']));
+})();
