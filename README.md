@@ -5,7 +5,11 @@ Entorno virtual de la unidad **«¿Qué hay en el aire? Explorando el comportami
 - `index.html`: portada de Quimiverso (logo y botón Ingresar)
 - `temas.html`: banco de temas
 - `construccion.html`: página «En construcción» con el modelo atómico 3D
-- `gases.html`: tema «El mundo de los gases», con la ruta de 3 semanas
+- `login.html`: inicio de sesión (curso y contraseña; los datos viven solo en la base de datos, cifrados)
+- `gases.html`: tema «El mundo de los gases»: justificación, objetivos, resultados y plan de trabajo
+- `ruta.html`: ruta secuencial por sesiones con progreso
+- `avance.html`: avance del curso del estudiante
+- `assets/curso-gases.js`: sesiones y actividades del tema
 - `reto.html`: situación problema (semana 1)
 - `casos.html`: estudio de casos y prueba (semana 2)
 - `laboratorios/`: laboratorios virtuales 3D (un archivo por práctica) de Boyle, Avogadro, Charles y Graham, con registro

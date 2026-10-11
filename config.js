@@ -10,7 +10,7 @@ window.CURSO = {
   diapositivasDaltonGraham: "recursos/semana-3-dalton-graham.pdf", // Semana 3 · Dalton y Graham
 
   // Cursos que aparecen al identificarse
-  cursos: ["10-1", "10-2", "10-3", "10-V", "11-1", "11-2", "11-V"],
+  cursos: ["10-1", "10-2", "10-3", "10V", "11-1", "11-2", "11V"],
 
   // Carpeta de Drive donde los estudiantes leen la realimentación
   carpetaDrive: "https://drive.google.com/drive/folders/1SKV59I5IHOKuDHUGLpGVUiqklnBJVI5n?usp=drive_link",

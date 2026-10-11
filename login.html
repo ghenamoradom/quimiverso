@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Ingresar · Quimiverso</title>
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Inicio de sesión: tarjeta centrada con logo, curso y contraseña */
+body{background:#fff}
+.wrapl{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+.lbox{width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px}
+.lbox img{width:220px;height:auto;align-self:center;margin-bottom:6px}
+.lbox h1{font-size:26px;text-align:center}
+.lbox .note{text-align:center}
+.lbox form{display:flex;flex-direction:column;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(22,32,42,.06)}
+.pw{position:relative}
+.pw input{padding-right:84px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font:inherit;font-size:13.5px;font-weight:700;color:var(--c1);cursor:pointer;padding:6px 8px}
+#msg{min-height:20px;font-size:14px;color:var(--bad);text-align:center}
+.back{text-align:center;font-size:14px}
+.back a{color:var(--muted)}
+</style>
+<script>window.QV_PUBLICA = true;</script>
+</head>
+<body>
+<main class="wrapl">
+  <div class="lbox">
+    <a href="./" aria-label="Quimiverso, inicio" style="align-self:center"><img src="assets/img/logo-quimiverso.png" alt="Quimiverso" width="640" height="205"></a>
+    <h1>Ingresa a tu curso</h1>
+    <form id="f" autocomplete="on" novalidate>
+      <label class="f">Curso<select id="curso" required></select></label>
+      <label class="f">Contraseña<span class="pw"><input id="clave" type="password" inputmode="numeric" autocomplete="current-password" maxlength="40" required><button type="button" id="ver" aria-pressed="false">Mostrar</button></span></label>
+      <button class="btn pri" type="submit" id="go" style="justify-content:center">Ingresar</button>
+      <p id="msg" role="alert"></p>
+    </form>
+    <p class="note">Tu contraseña te la entrega el profesor. Si no puedes ingresar, avísale.</p>
+    <p class="back"><a href="./">← Volver al inicio</a></p>
+  </div>
+</main>
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+<script>
+(function(){
+  const { $, esc, rpc, sesion, guardarSesion } = QG;
+  const next = (() => { const n = new URLSearchParams(location.search).get('next') || 'temas.html'; return /^[a-z0-9_\-]+\.html([?#].*)?$|^laboratorios\//i.test(n) ? n : 'temas.html'; })();
+  if (sesion()){ location.replace(next); return; }
+  const cursos = (window.CURSO && CURSO.cursos) || [];
+  $('#curso').innerHTML = '<option value="">Elige tu curso</option>' + cursos.map(c => '<option>' + esc(c) + '</option>').join('') + '<option value="Demo">Demo</option>';
+  $('#ver').onclick = () => { const i = $('#clave'), v = i.type === 'password'; i.type = v ? 'text' : 'password'; $('#ver').textContent = v ? 'Ocultar' : 'Mostrar'; $('#ver').setAttribute('aria-pressed', v); };
+  const ERR = { credenciales: 'El curso o la contraseña no coinciden. Revisa e inténtalo de nuevo.', bloqueado: 'Demasiados intentos fallidos. Espera 15 minutos e inténtalo de nuevo.', datos: 'Escribe tu contraseña.' };
+  $('#f').onsubmit = async e => {
+    e.preventDefault();
+    const curso = $('#curso').value, clave = $('#clave').value.trim(), m = $('#msg');
+    if (!curso){ m.textContent = 'Elige tu curso.'; return; }
+    if (!clave){ m.textContent = 'Escribe tu contraseña.'; return; }
+    $('#go').disabled = true; m.textContent = '';
+    try {
+      const r = await rpc('login', { p_curso: curso, p_clave: clave });
+      if (!r || r.error){ m.textContent = ERR[r && r.error] || 'No se pudo ingresar.'; $('#clave').select(); return; }
+      guardarSesion({ token: r.token, id: r.id, nombre: r.nombre, curso: r.curso });
+      location.replace(next);
+    } catch(err){ m.textContent = 'Sin conexión con el servidor. Revisa tu internet e inténtalo de nuevo.'; }
+    finally { $('#go').disabled = false; }
+  };
+})();
+</script>
+</body>
+</html>

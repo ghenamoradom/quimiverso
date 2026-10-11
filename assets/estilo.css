@@ -79,3 +79,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none}
 .foot .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
 .foot a{color:var(--muted)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* usuario con sesión y botón destacado del menú */
+.user{display:flex;align-items:center;gap:10px;margin-left:10px;font-size:13.5px;color:var(--muted);white-space:nowrap}
+.user:empty{display:none}
+.user .uname{max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.user b{color:var(--fg)}
+.nav a.navbtn{border:1px solid var(--c1);color:var(--c1)}
+.nav a.navbtn:hover{background:#effaf9;color:var(--c1)}
+@media (max-width:760px){.user .uname{display:none}.user{margin-left:4px;gap:6px}.nav{flex:1 1 auto;min-width:0}.top .wrap{gap:8px}.brand img{height:32px}}

@@ -1,4 +1,5 @@
-/* Funciones compartidas: base de datos, identificación del estudiante y enlaces del curso */
+/* Funciones compartidas: base de datos, sesión del estudiante y enlaces del curso.
+   Las páginas que no requieren sesión definen window.QV_PUBLICA = true antes de cargar este archivo. */
 (function(){
   const C = window.CURSO || {}, S = window.SUPABASE || {};
   const $ = (s, r) => (r || document).querySelector(s);
@@ -24,88 +25,64 @@
     return t ? JSON.parse(t) : null;
   }
 
-  /* ---------- identificación ---------- */
-  const ID_KEY = 'qg_estudiante';
-  /* Se comparte con los laboratorios virtuales, que guardan {est, nombre, curso} en 'labgases-id' */
-  function quien(){
-    const l = store.get('labgases-id');
-    if (l && l.nombre && l.curso && l.nombre !== 'Estudiante anónimo') return { estudiante_id: l.est || null, nombre: l.nombre, curso: l.curso };
-    const q = store.get(ID_KEY); return q && q.nombre ? q : (IDENTIFICAR ? null : ANONIMO);
+  /* ---------- sesión ---------- */
+  const SES = 'qv_sesion';
+  const sesion = () => { const s = store.get(SES); return s && s.token ? s : null; };
+  function guardarSesion(s){
+    store.set(SES, s);
+    // los laboratorios virtuales registran al estudiante con esta clave
+    store.set('labgases-id', { est: s.id, nombre: s.nombre, curso: s.curso });
   }
-  function guardarQuien(q){ store.set(ID_KEY, q); store.set('labgases-id', { est: q.estudiante_id || null, nombre: q.nombre, curso: q.curso }); }
-  function pintarQuien(){
-    const w = $('#who'); if (!w) return;
-    const q = quien();
-    w.innerHTML = q ? '<span class="wl">Estudiante: </span><b>' + esc(q.nombre.split(' ').slice(0, 2).join(' ')) + '</b><span class="wc"> · ' + esc(q.curso) + '</span>' : 'Identifícate'; w.title = q ? q.nombre + ' · ' + q.curso + ' (cambiar)' : '';
+  function borrarSesion(){ store.del(SES); store.del('labgases-id'); }
+  const aqui = () => location.pathname.split('/').pop() + location.search + location.hash;
+  function irALogin(){ location.replace('login.html?next=' + encodeURIComponent(aqui() || 'temas.html')); }
+  async function salir(){
+    const s = sesion(); borrarSesion();
+    try { if (s) await rpc('salir', { p_token: s.token }); } catch(e){}
+    location.href = './';
   }
-  function gateHTML(){
-    return '<div class="gate" id="gate" hidden><form class="box" id="gForm">' +
-      '<p class="eyebrow">Quimiverso · Química General</p><h2>¿Quién eres?</h2>' +
-      '<p class="note">Tu nombre queda con tus respuestas para que el profesor pueda darte realimentación. Te identificas una sola vez en este dispositivo.</p>' +
-      '<label class="f">Curso<select id="gCurso" required></select></label>' +
-      '<label class="f" id="gListaL" hidden>Nombre<select id="gLista"></select></label>' +
-      '<label class="f" id="gLibreL" hidden>Nombre completo<input id="gLibre" placeholder="Apellidos y nombres" maxlength="120" autocomplete="name"></label>' +
-      '<p class="note" id="gMsg" role="status"></p>' +
-      '<div class="btnrow"><button class="btn pri" type="submit">Continuar</button><button class="btn" type="button" id="gCancel">Cancelar</button></div>' +
-      '</form></div>';
+  const corto = n => String(n || '').split(' ').filter(Boolean).slice(-2).map(w => w[0] + w.slice(1).toLowerCase()).join(' ');
+  function pintarUsuario(){
+    const el = $('#user'), s = sesion(); if (!el || !s) return;
+    el.innerHTML = '<span class="uname" title="' + esc(s.nombre + ' · ' + s.curso) + '"><b>' + esc(corto(s.nombre) || s.nombre) + '</b><span class="ucur"> · ' + esc(s.curso) + '</span></span><button type="button" class="btn sm" id="bSalir">Salir</button>';
+    $('#bSalir').onclick = salir;
   }
-  async function pedirIdentidad(obligatorio){
-    if (!$('#gate')) document.body.insertAdjacentHTML('beforeend', gateHTML());
-    const g = $('#gate'), sc = $('#gCurso'), sl = $('#gLista'), msg = $('#gMsg');
-    const cursos = C.cursos || ['10-1','10-2','10-3','10-V','11-1','11-2','11-V'];
-    g.hidden = false; $('#gCancel').hidden = !!obligatorio; msg.textContent = '';
-    $('#gListaL').hidden = true; $('#gLibreL').hidden = true;
-    sc.innerHTML = '<option value="">Elige tu curso</option>' + cursos.map(c => '<option>' + esc(c) + '</option>').join('');
-    sc.onchange = async () => {
-      const v = sc.value; $('#gListaL').hidden = true; $('#gLibreL').hidden = true; msg.textContent = '';
-      if (!v) return;
-      sl.innerHTML = '<option value="">Cargando la lista…</option>'; $('#gListaL').hidden = false;
-      let l = [];
-      try { l = (await rpc('lista_curso', { p_curso: v })) || []; } catch(e){ l = null; }
-      if (sc.value !== v) return;
-      if (l && l.length){
-        sl.innerHTML = '<option value="">Elige tu nombre</option>' + l.map(x => '<option value="' + esc(x.id) + '">' + esc(x.etiqueta) + '</option>').join('') + '<option value="__libre">Mi nombre no aparece</option>';
-      } else {
-        $('#gListaL').hidden = true; $('#gLibreL').hidden = false;
-        msg.textContent = l === null ? 'Sin conexión: escribe tu nombre completo.' : 'La lista de este curso aún no está cargada: escribe tu nombre completo.';
-      }
-    };
-    sl.onchange = () => { $('#gLibreL').hidden = sl.value !== '__libre'; };
-    return new Promise(res => {
-      $('#gCancel').onclick = () => { g.hidden = true; res(quien()); };
-      $('#gForm').onsubmit = e => {
-        e.preventDefault();
-        const curso = sc.value; let nombre = '', id = null;
-        const lv = !$('#gListaL').hidden ? sl.value : '';
-        if (lv && lv !== '__libre'){ id = lv; nombre = sl.selectedOptions[0].textContent; }
-        else if (!$('#gLibreL').hidden) nombre = $('#gLibre').value.trim().replace(/\s+/g, ' ');
-        if (!curso){ msg.textContent = 'Elige tu curso.'; return; }
-        if (!nombre || nombre.length < 5){ msg.textContent = $('#gLibreL').hidden ? 'Elige tu nombre de la lista.' : 'Escribe tu nombre completo.'; return; }
-        const q = { estudiante_id: id, nombre, curso };
-        const antes = quien(); guardarQuien(q); g.hidden = true; pintarQuien(); res(q);
-        if (antes && claveDe(antes) !== claveDe(q)) dispatchEvent(new Event('qg:identidad'));
-      };
-    });
+  // Guardia: sin sesión no se ve la página
+  if (!window.QV_PUBLICA && !sesion()){ irALogin(); }
+  // Comprueba en segundo plano que la sesión siga vigente
+  async function verificar(){
+    const s = sesion(); if (!s) return;
+    try { const r = await rpc('sesion_info', { p_token: s.token }); if (!r){ borrarSesion(); if (!window.QV_PUBLICA) irALogin(); } }
+    catch(e){ /* sin conexión: se deja seguir */ }
   }
-  function claveDe(q){ const s = (q.estudiante_id || (q.curso + '|' + q.nombre)).toLowerCase(); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
-  /* Por ahora el sitio no pide identificación: las respuestas se guardan como anónimas.
-     Para volver a pedir nombre, cambia IDENTIFICAR a true. */
-  const IDENTIFICAR = false;
-  const ANONIMO = { estudiante_id: null, nombre: 'Estudiante anónimo', curso: null };
-  async function asegurarIdentidad(){ return quien() || (IDENTIFICAR ? await pedirIdentidad(true) : ANONIMO); }
+  // Compatibilidad con reto y casos
+  function quien(){ const s = sesion(); return s ? { estudiante_id: s.id, nombre: s.nombre, curso: s.curso } : null; }
+  async function asegurarIdentidad(){ const q = quien(); if (!q){ irALogin(); return new Promise(() => {}); } return q; }
+  function claveDe(q){ const s = String(q.estudiante_id || (q.curso + '|' + q.nombre)).toLowerCase(); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+
+  /* ---------- progreso ---------- */
+  async function progreso(){
+    const s = sesion(); if (!s) return null;
+    const r = await rpc('progreso_mio', { p_token: s.token });
+    if (r && r.error === 'sesion'){ borrarSesion(); irALogin(); return null; }
+    return r;
+  }
+  async function marcar(act){
+    const s = sesion(); if (!s) return null;
+    const r = await rpc('progreso_marcar', { p_token: s.token, p_actividad: act });
+    if (r && r.error === 'sesion'){ borrarSesion(); irALogin(); return null; }
+    return r;
+  }
 
   /* ---------- enlaces del curso ---------- */
-  function enlaces(){
-    document.querySelectorAll('[data-link]').forEach(a => {
+  function enlaces(root){
+    (root || document).querySelectorAll('[data-link]').forEach(a => {
       const u = C[a.dataset.link];
       if (u){ a.href = u; if (/^https?:|\.pdf/.test(u)){ a.target = '_blank'; a.rel = 'noopener'; } }
       else { a.removeAttribute('href'); a.classList.add('off'); a.setAttribute('aria-disabled','true'); a.title = 'Disponible pronto'; const s = a.querySelector('.lbl'); if (s) s.textContent = s.dataset.pronto || 'Disponible pronto'; }
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    enlaces(); pintarQuien();
-    const w = $('#who'); if (w) w.onclick = () => pedirIdentidad(false);
-  });
-  window.QG = { $, esc, store, uuid, rpc, quien, pedirIdentidad, asegurarIdentidad, pintarQuien, claveDe };
+  document.addEventListener('DOMContentLoaded', () => { enlaces(); pintarUsuario(); verificar(); });
+  window.QG = { $, esc, store, uuid, rpc, sesion, guardarSesion, borrarSesion, salir, quien, asegurarIdentidad, claveDe, progreso, marcar, enlaces, corto };
 })();

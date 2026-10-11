@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Avance del curso · Quimiverso</title>
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Avance: anillo con el porcentaje total; barras por semana; lista de actividades por sesión */
+.head{padding:40px 0 10px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:center}
+.ring{width:150px;height:150px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:12}
+.ring .bg{stroke:#e6eaed}.ring .fg{stroke:var(--c1);stroke-linecap:round;transition:stroke-dashoffset .8s}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-size:34px}
+.head h1{font-size:clamp(28px,4.4vw,42px)}
+.head p{color:var(--muted);margin-top:8px;font-size:16.5px}
+.head .btnrow{margin-top:16px}
+.weeks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin-top:22px}
+.wk{display:flex;flex-direction:column;gap:12px}
+.wk .t{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.wk .t b{font-family:var(--f-mono);font-size:14px;color:var(--c1)}
+.wk h2{font-size:19px}
+.bar{height:8px;border-radius:4px;background:#e6eaed;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c1);width:0;transition:width .6s}
+.ses h3{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--f-mono);font-weight:500;margin:4px 0 6px}
+.ses ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ses li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:14.5px}
+.ses li .ic{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;color:#fff}
+.ses li.ok .ic{background:var(--ok);border-color:var(--ok)}
+.ses li.now .ic{border-color:var(--c1)}
+.ses li.now{font-weight:700}
+.ses li small{color:var(--muted);font-size:12.5px;white-space:nowrap}
+@media (max-width:560px){.head{grid-template-columns:1fr;justify-items:start}.ring{width:120px;height:120px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="temas.html"><img src="assets/img/logo-quimiverso.png" alt="Quimiverso" width="140" height="45"><span>El mundo de los gases</span></a>
+  <nav class="nav" aria-label="Secciones"><a href="gases.html">← Inicio del tema</a><a href="ruta.html" id="nRuta">Ruta</a></nav>
+  <div class="user" id="user"></div>
+</div></header>
+
+<main class="wrap">
+  <section class="head">
+    <div class="ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="arc" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg><b id="pct">…</b></div>
+    <div>
+      <p class="eyebrow">Avance del curso</p>
+      <h1 id="hola">Tu progreso en El mundo de los gases</h1>
+      <p id="resumen">Cargando…</p>
+      <div class="btnrow"><a class="btn pri" href="ruta.html?s=1-1" id="bSeguir">Empezar la ruta</a></div>
+    </div>
+  </section>
+  <div class="weeks" id="weeks"></div>
+</main>
+<footer class="foot"><div class="wrap"><span>Quimiverso · IE Juan XXIII · Prof. Germán Holland Enamorado Montes</span></div></footer>
+
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+<script src="assets/curso-gases.js"></script>
+<script>
+(function(){
+  const G = window.GASES, A = G.actividades, { esc } = QG;
+  const s = QG.sesion(); if (s) document.getElementById('hola').textContent = 'Hola, ' + QG.corto(s.nombre).split(' ').pop() + ': este es tu avance';
+  const fecha = t => new Date(t).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+  QG.progreso().then(p => {
+    if (!p || p.error){ document.getElementById('resumen').textContent = 'No se pudo cargar tu avance.'; return; }
+    const mapa = new Map(p.hechas.map(x => [x.actividad, x.t])), n = mapa.size, pct = Math.round(n / A.length * 100);
+    const sig = A.find(a => !mapa.has(a.c));
+    document.getElementById('pct').textContent = pct + ' %';
+    requestAnimationFrame(() => document.getElementById('arc').style.strokeDashoffset = 326.7 * (1 - n / A.length));
+    document.getElementById('resumen').textContent = n === A.length ? '¡Completaste las tres semanas! Terminaste las ' + A.length + ' actividades.' : 'Has completado ' + n + ' de ' + A.length + ' actividades. ' + (sig ? 'Tu siguiente actividad es «' + sig.titulo + '».' : '');
+    const b = document.getElementById('bSeguir');
+    if (sig){ b.href = 'ruta.html?s=' + sig.s; b.textContent = n ? 'Continuar la ruta' : 'Empezar la ruta'; document.getElementById('nRuta').href = b.href; }
+    else { b.href = 'ruta.html?s=1-1'; b.textContent = 'Repasar la ruta'; }
+    document.getElementById('weeks').innerHTML = G.semanas.map(w => {
+      const ses = G.sesiones.filter(x => x.semana === w.n), as = A.filter(a => ses.some(x => x.id === a.s)), h = as.filter(a => mapa.has(a.c)).length;
+      return '<article class="card wk"><div class="t"><span class="eyebrow">Semana ' + w.n + '</span><b>' + h + '/' + as.length + '</b></div><h2>' + esc(w.titulo) + '</h2><div class="bar"><i style="width:' + Math.round(h / as.length * 100) + '%"></i></div>' +
+        ses.map(x => '<div class="ses"><h3>Sesión ' + x.n + ' · ' + esc(x.lugar) + '</h3><ul>' + A.filter(a => a.s === x.id).map(a => {
+          const ok = mapa.has(a.c), now = sig && sig.c === a.c;
+          return '<li class="' + (ok ? 'ok' : now ? 'now' : '') + '"><span class="ic" aria-hidden="true">' + (ok ? '✓' : '') + '</span><span>' + esc(a.titulo) + '</span><small>' + (ok ? fecha(mapa.get(a.c)) : now ? 'Siguiente' : '') + '</small></li>';
+        }).join('') + '</ul></div>').join('') + '<div class="btnrow">' + ses.map(x => '<a class="btn sm" href="ruta.html?s=' + x.id + '">Sesión ' + x.n + '</a>').join('') + '</div></article>';
+    }).join('');
+  }).catch(() => { document.getElementById('resumen').textContent = 'Sin conexión con el servidor. Revisa tu internet y recarga la página.'; });
+})();
+</script>
+</body>
+</html>

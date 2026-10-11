@@ -67,22 +67,24 @@ td small{color:var(--muted);margin-left:6px}
   </form>
 
   <div id="app" hidden>
-    <div class="bar"><div><h1>Panel docente</h1><p class="note">Respuestas de la situación problema y del estudio de casos</p></div>
+    <div class="bar"><div><h1>Panel docente</h1><p class="note">Progreso de los estudiantes y respuestas de los aplicativos</p></div>
       <div class="ctrl"><select id="fCurso" aria-label="Curso"><option value="">Todos los cursos</option></select><select id="fDias" aria-label="Periodo"><option value="14">Últimos 14 días</option><option value="60" selected>Últimos 60 días</option><option value="365">Último año</option></select><button class="btn sm" id="csv">Descargar CSV</button><button class="btn sm pri" id="reload">Actualizar</button><span class="upd" id="upd"></span></div></div>
-    <nav class="tabs" role="tablist"><button role="tab" data-t="reto" aria-selected="true">Situación problema</button><button role="tab" data-t="casos" aria-selected="false">Estudio de casos</button><button role="tab" data-t="labs" aria-selected="false">Laboratorios virtuales</button></nav>
-    <section id="v-reto"><div class="sums" id="s-reto"></div><div class="layout"><div class="tblw"><table id="t-reto"></table></div><aside class="det" id="d-reto"><p class="empty">Elige un estudiante para leer sus respuestas y escribir la realimentación.</p></aside></div></section>
+    <nav class="tabs" role="tablist"><button role="tab" data-t="prog" aria-selected="true">Progreso</button><button role="tab" data-t="reto" aria-selected="false">Situación problema</button><button role="tab" data-t="casos" aria-selected="false">Estudio de casos</button><button role="tab" data-t="labs" aria-selected="false">Laboratorios virtuales</button></nav>
+    <section id="v-prog"><div class="sums" id="s-prog"></div><div class="tblw"><table id="t-prog"></table></div></section>
+    <section id="v-reto" hidden><div class="sums" id="s-reto"></div><div class="layout"><div class="tblw"><table id="t-reto"></table></div><aside class="det" id="d-reto"><p class="empty">Elige un estudiante para leer sus respuestas y escribir la realimentación.</p></aside></div></section>
     <section id="v-casos" hidden><div class="sums" id="s-casos"></div><div class="layout"><div class="tblw"><table id="t-casos"></table></div><aside class="det" id="d-casos"><p class="empty">Elige un estudiante para ver sus respuestas.</p></aside></div>
       <h2 style="font-size:20px;margin:22px 0 10px">Acierto por pregunta de la prueba</h2><div class="qst" id="qst"></div></section>
     <section id="v-labs" hidden><div class="card" style="margin-top:16px;max-width:640px;display:flex;flex-direction:column;gap:10px"><h2 style="font-size:22px">Seguimiento de los laboratorios virtuales</h2><p>Los ingresos, la nota de ejecución y comprensión, el banco de preguntas y la lista de estudiantes están en el tablero de los laboratorios. Entra con la misma contraseña.</p><div class="btnrow"><a class="btn pri" href="laboratorios/#docente">Abrir el tablero de laboratorios</a></div><p class="note">Ahí también se carga la lista de estudiantes. Cuando la cargues, en todo el sitio los estudiantes eligen su nombre en lugar de escribirlo.</p></div></section>
   </div>
 </main>
 
+<script>window.QV_PUBLICA = true;</script>
 <script src="config.js"></script>
 <script src="assets/comun.js"></script>
 <script>
 (function(){
 const { $, esc, rpc } = QG;
-let CLAVE = null, DATA = null, TAB = 'reto';
+let CLAVE = null, DATA = null, PROG = null, TAB = 'prog';
 const fmt = (n, d = 1) => n == null || isNaN(n) ? '—' : Number(n).toLocaleString('es-CO', { maximumFractionDigits: d });
 const date = s => new Date(s).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 const ERR = { clave_incorrecta: 'Contraseña incorrecta.', acceso_bloqueado: 'Demasiados intentos fallidos. Espera 15 minutos.', red: 'Sin conexión con la base de datos. Revisa internet; si Supabase estaba pausado, reactívalo en supabase.com.' };
@@ -90,8 +92,11 @@ async function load(){
   $('#upd').textContent = 'Consultando…';
   const r = await rpc('docente_apps', { p_clave: CLAVE, p_dias: +$('#fDias').value });
   if (r && r.error) throw Object.assign(new Error(r.error), { code: r.error });
+  const pr = await rpc('docente_progreso', { p_clave: CLAVE });
+  if (pr && pr.error) throw Object.assign(new Error(pr.error), { code: pr.error });
+  PROG = pr;
   DATA = r; $('#upd').textContent = 'Actualizado ' + new Date(r.generado).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-  const cs = [...new Set(DATA.envios.map(e => e.curso).filter(Boolean))].sort(), sel = $('#fCurso'), cur = sel.value;
+  const cs = [...new Set(PROG.estudiantes.map(e => e.curso).concat(DATA.envios.map(e => e.curso)).filter(Boolean))].sort(), sel = $('#fCurso'), cur = sel.value;
   sel.innerHTML = '<option value="">Todos los cursos</option>' + cs.map(c => '<option' + (c === cur ? ' selected' : '') + '>' + esc(c) + '</option>').join('');
   render();
 }
@@ -104,7 +109,7 @@ $('#login').onsubmit = async e => {
 };
 $('#reload').onclick = () => load().catch(e => $('#upd').textContent = ERR[e.code] || ERR.red);
 $('#fDias').onchange = $('#reload').onclick; $('#fCurso').onchange = () => render();
-document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { TAB = b.dataset.t; document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); ['reto','casos','labs'].forEach(t => $('#v-' + t).hidden = t !== TAB); $('#csv').hidden = TAB === 'labs'; });
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { TAB = b.dataset.t; document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); ['prog','reto','casos','labs'].forEach(t => $('#v-' + t).hidden = t !== TAB); $('#csv').hidden = TAB === 'labs'; });
 
 const list = app => DATA.envios.filter(e => e.app === app && (!$('#fCurso').value || e.curso === $('#fCurso').value));
 const mark = c => !c ? '<span class="empty">—</span>' : c.ok ? '<span class="ok">✓</span><small>' + c.intentos + ' int.</small>' : '<span class="no">✗</span><small>' + c.intentos + ' int.</small>';
@@ -112,7 +117,19 @@ const PRED = { si: 'Revienta', no: 'Entero', nose: 'No se sabe' };
 const ans = (t, lab) => '<h4>' + esc(lab) + '</h4><div class="ans' + ((t || '').trim() ? '' : ' empty') + '">' + ((t || '').trim() ? esc(t) : 'Sin respuesta') + '</div>';
 const sums = (el, a) => el.innerHTML = a.map(x => '<div class="sum"><b>' + x[1] + '</b><span>' + esc(x[0]) + '</span></div>').join('');
 
-function render(){ renderReto(); renderCasos(); }
+function render(){ renderProg(); renderReto(); renderCasos(); }
+function renderProg(){
+  const cur = $('#fCurso').value, A = PROG.actividades, N = A.length;
+  const L = PROG.estudiantes.filter(e => !cur || e.curso === cur);
+  const ing = L.filter(e => e.ingreso).length, tot = L.filter(e => e.hechas.length >= N).length;
+  const avg = L.length ? L.reduce((a, e) => a + e.hechas.length, 0) / L.length / N * 100 : 0;
+  sums($('#s-prog'), [['Estudiantes', L.length], ['Han ingresado', ing], ['Avance promedio', fmt(avg, 0) + ' %'], ['Completaron el curso', tot]]);
+  const nombreAct = c => (A.find(a => a.codigo === c) || {}).titulo || c;
+  $('#t-prog').innerHTML = '<thead><tr><th>Estudiante</th><th>Curso</th><th>Avance</th><th>Va en</th><th>Última actividad</th><th>Último ingreso</th></tr></thead><tbody>' +
+    (L.length ? L.map(e => { const n = e.hechas.length, pct = Math.round(n / N * 100), sig = A.find(a => !e.hechas.includes(a.codigo));
+      return '<tr><td>' + esc(e.nombre) + '</td><td>' + esc(e.curso) + '</td><td><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:90px;height:7px;border-radius:4px;background:#e6eaed;overflow:hidden;display:inline-block"><i style="display:block;height:100%;width:' + pct + '%;background:var(--c1)"></i></span><span class="mono">' + n + '/' + N + '</span></span></td><td>' + (sig ? 'S' + sig.semana + '·' + sig.sesion + ' ' + esc(sig.titulo) : '<span class="ok">Completó</span>') + '</td><td>' + (e.ultimo ? date(e.ultimo) : '—') + '</td><td>' + (e.ingreso ? date(e.ingreso) : '<span class="empty">Nunca</span>') + '</td></tr>'; }).join('')
+     : '<tr><td colspan="6" class="empty">No hay estudiantes en este curso.</td></tr>') + '</tbody>';
+}
 function renderReto(){
   const L = list('reto');
   const env = L.filter(e => e.completado).length, calc = L.filter(e => { const c = (e.respuestas || {}).checks || {}; return c.v1 && c.v1.ok && c.v2 && c.v2.ok && c.v3 && c.v3.ok; }).length;
@@ -156,8 +173,15 @@ function detCasos(e){
     '<h4>Prueba</h4>' + ((e.prueba || []).length ? '<div class="kv">' + e.prueba.map(p => '<span>' + esc((P[p.pregunta] || {}).enunciado || p.pregunta).slice(0, 70) + '…</span><b>' + 'ABCD'[p.elegida] + ' ' + (p.correcta ? '<span class="ok">✓</span>' : '<span class="no">✗</span>') + '</b>').join('') + '</div>' : '<p class="empty">No ha presentado la prueba.</p>');
 }
 $('#csv').onclick = () => {
-  if (!DATA) return; const L = list(TAB), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  if (!DATA) return; const q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
   let rows;
+  if (TAB === 'prog'){
+    const A = PROG.actividades, cur = $('#fCurso').value;
+    rows = [['curso','nombre','completadas','total','porcentaje','ultimo_ingreso', ...A.map(a => a.codigo)]].concat(PROG.estudiantes.filter(e => !cur || e.curso === cur).map(e => [e.curso, e.nombre, e.hechas.length, A.length, Math.round(e.hechas.length / A.length * 100), e.ingreso || '', ...A.map(a => e.hechas.includes(a.codigo) ? 'si' : '')]));
+    const blob = new Blob(['\ufeff' + rows.map(r => r.map(q).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'progreso-gases.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); return;
+  }
+  const L = list(TAB);
   if (TAB === 'reto'){ const K = ['sabemos','necesitamos','cambian','prediccion','prediccion_por','tcm1','tcm2','revienta2','evalua_pred','revienta3','solucion','a_entendi','a_calculos','a_explico','mejorar'];
     rows = [['curso','nombre','estado','pasos','v1','v1_ok','v2','v2_ok','v3','v3_ok', ...K, 'actualizado']].concat(L.map(e => { const R = e.respuestas || {}, c = R.checks || {}, r = R.r || {}; return [e.curso, e.nombre, e.completado ? 'enviado' : 'en curso', R.pasos || 0, ...['v1','v2','v3'].flatMap(k => [c[k] ? c[k].ultimo : '', c[k] ? (c[k].ok ? 'si' : 'no') : '']), ...K.map(k => r[k]), e.actualizado]; })); }
   else { const K = ['olla_const','olla_tcm','llanta_sacar','llanta_por','airbag_av'];

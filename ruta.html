@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ruta · El mundo de los gases · Quimiverso</title>
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+<style>
+/* Ruta: barra de progreso fija; panel lateral con 6 sesiones; sesión actual con actividades secuenciales */
+.pbar{position:sticky;top:58px;z-index:15;background:rgba(245,246,247,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.pbar .wrap{display:flex;align-items:center;gap:12px;min-height:44px;font-size:13.5px;color:var(--muted)}
+.pbar .bar{flex:1;height:8px;border-radius:4px;background:#e6eaed;overflow:hidden}
+.pbar .bar i{display:block;height:100%;width:0;background:var(--c1);transition:width .5s}
+.pbar b{font-family:var(--f-mono);color:var(--fg)}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:28px;padding-block:24px 40px;align-items:start}
+.side{position:sticky;top:116px;display:flex;flex-direction:column;gap:14px}
+.side h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--f-mono);font-weight:500}
+.wkg{display:flex;flex-direction:column;gap:6px}
+.wkg > span{font-size:12.5px;font-weight:700;color:var(--muted);padding-left:4px}
+.sl{display:grid;grid-template-columns:26px minmax(0,1fr);gap:2px 10px;align-items:center;text-decoration:none;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.sl:hover{border-color:var(--line2)}
+.sl .ic{grid-row:span 2;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:1.5px solid var(--line2);color:var(--muted);font-family:var(--f-mono)}
+.sl b{font-size:14.5px;line-height:1.25}
+.sl small{font-size:12.5px;color:var(--muted)}
+.sl.done .ic{background:var(--ok);border-color:var(--ok);color:#fff}
+.sl.now .ic{border-color:var(--c1);color:var(--c1)}
+.sl[aria-current=page]{border-color:var(--c1);box-shadow:0 0 0 2px rgba(15,122,122,.12)}
+.sl.lock{opacity:.6}
+.main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.shd .eyebrow{color:var(--c1)}
+.shd h1{font-size:clamp(28px,4.4vw,40px);margin-top:6px}
+.shd p{color:var(--muted);font-size:17px;margin-top:10px;max-width:70ch}
+.banner{border:1px solid var(--line);border-left:4px solid var(--warn);background:var(--panel);border-radius:12px;padding:14px 16px;font-size:15px}
+.act{border:1px solid var(--line);background:var(--panel);border-radius:14px;overflow:hidden}
+.act > button.h{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px;cursor:pointer}
+.act > button.h:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.act .k{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;font-size:13px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.act .h3{display:block;font-family:var(--f-display);font-weight:700;font-size:18px;line-height:1.2}
+.act .tp{display:block;font-size:13px;color:var(--c1);margin-top:2px}
+.act .st{font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.act.done .k{background:var(--ok);color:#fff;border-color:var(--ok)}
+.act.done .st{color:var(--ok)}
+.act.now{border-color:var(--c1);box-shadow:0 6px 18px rgba(15,122,122,.08)}
+.act.now .k{background:var(--c1);color:#fff;border-color:var(--c1)}
+.act.now .st{color:var(--c1)}
+.act.lock{background:#fafbfb}
+.act.lock .h3,.act.lock .tp{color:#97a3ab}
+.act .bd{padding:0 16px 16px 62px;display:flex;flex-direction:column;gap:12px}
+.act .bd p{font-size:15.5px}
+.act .ent{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.act .ent b{color:var(--fg)}
+.next{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:1px dashed var(--line2);padding-top:12px}
+.next .note{flex:1 1 220px}
+.endbox{border:1px solid var(--c1);background:#effaf9;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.endbox h2{font-size:22px}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  .side{position:static;min-width:0}
+  .side .wkgs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+  .wkg{flex:none}
+  .wkg > span{display:none}
+  .sl{min-width:200px}
+  .act .bd{padding-left:16px}
+  .plbl{display:none}
+  .pbar b{font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){.pbar .bar i{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="temas.html"><img src="assets/img/logo-quimiverso.png" alt="Quimiverso" width="140" height="45"><span>El mundo de los gases</span></a>
+  <nav class="nav" aria-label="Secciones"><a href="gases.html">← Inicio del tema</a><a href="avance.html" class="navbtn">Avance del curso</a></nav>
+  <div class="user" id="user"></div>
+</div></header>
+<div class="pbar"><div class="wrap"><span class="plbl">Avance del curso</span><span class="bar"><i id="pb"></i></span><b id="pt">…</b></div></div>
+
+<main class="wrap layout">
+  <aside class="side" aria-label="Sesiones">
+    <h2>Sesiones</h2>
+    <div class="wkgs" id="side"></div>
+  </aside>
+  <div class="main" id="main"><p class="note">Cargando tu avance…</p></div>
+</main>
+
+<script src="config.js"></script>
+<script src="assets/comun.js"></script>
+<script src="assets/curso-gases.js"></script>
+<script>
+(function(){
+  const G = window.GASES, { esc } = QG;
+  const A = G.actividades, S = G.sesiones;
+  let hechas = new Set(), sid = new URLSearchParams(location.search).get('s') || '1-1', abiertas = new Set(), ocupado = false;
+  if (!S.some(s => s.id === sid)) sid = '1-1';
+
+  const actual = () => A.find(a => !hechas.has(a.c)) || null;      // siguiente actividad pendiente
+  const estado = a => hechas.has(a.c) ? 'done' : (actual() && actual().c === a.c ? 'now' : 'lock');
+  const sesEstado = s => { const as = A.filter(a => a.s === s.id); if (as.every(a => hechas.has(a.c))) return 'done'; if (as.some(a => estado(a) === 'now')) return 'now'; return 'lock'; };
+  const sesName = s => 'Semana ' + s.semana + ' · Sesión ' + s.n;
+
+  function btn(r){
+    const [label, link, href, pri] = r, cls = 'btn sm' + (pri ? ' pri' : '');
+    if (link) return '<a class="' + cls + '" data-link="' + link + '"><span class="lbl" data-pronto="' + esc(label) + ' · pronto">' + esc(label) + '</span></a>';
+    return '<a class="' + cls + '" href="' + href + '">' + esc(label) + '</a>';
+  }
+  function pintarBarra(){
+    const pct = Math.round(hechas.size / A.length * 100);
+    document.getElementById('pb').style.width = pct + '%';
+    document.getElementById('pt').textContent = pct + ' % · ' + hechas.size + ' de ' + A.length + ' actividades';
+  }
+  function pintarLado(){
+    document.getElementById('side').innerHTML = G.semanas.map(w => '<div class="wkg"><span>Semana ' + w.n + '</span>' +
+      S.filter(s => s.semana === w.n).map(s => {
+        const st = sesEstado(s), as = A.filter(a => a.s === s.id), n = as.filter(a => hechas.has(a.c)).length;
+        return '<a class="sl ' + st + '" href="ruta.html?s=' + s.id + '" data-s="' + s.id + '"' + (s.id === sid ? ' aria-current="page"' : '') + '>' +
+          '<span class="ic" aria-hidden="true">' + (st === 'done' ? '✓' : s.semana + '.' + s.n) + '</span><b>' + sesName(s) + '</b><small>' + esc(s.lugar) + ' · ' + n + '/' + as.length + (st === 'lock' ? ' · bloqueada' : st === 'done' ? ' · completada' : ' · en curso') + '</small></a>';
+      }).join('') + '</div>').join('');
+    document.querySelectorAll('.sl').forEach(a => a.onclick = e => { e.preventDefault(); ir(a.dataset.s); });
+  }
+  function pintarMain(){
+    const s = S.find(x => x.id === sid), as = A.filter(a => a.s === sid), cur = actual();
+    let html = '<header class="shd"><p class="eyebrow">' + sesName(s) + ' · ' + esc(s.lugar) + ' · 2 horas</p><h1>' + esc(s.titulo) + '</h1><p>' + esc(s.desc) + '</p></header>';
+    if (sesEstado(s) === 'lock' && cur){
+      const cs = S.find(x => x.id === cur.s);
+      html += '<div class="banner">Esta sesión se desbloquea cuando completes las anteriores. Vas en <b>' + sesName(cs) + '</b>: «' + esc(cur.titulo) + '». <a href="ruta.html?s=' + cs.id + '" data-go="' + cs.id + '">Ir a esa actividad →</a></div>';
+    }
+    html += as.map((a, i) => {
+      const st = estado(a), open = st === 'now' || abiertas.has(a.c);
+      const stTxt = st === 'done' ? 'Completada ✓' : st === 'now' ? 'Actividad actual' : 'Bloqueada';
+      let bd = '';
+      if (open && st !== 'lock'){
+        bd = '<div class="bd"><p>' + esc(a.desc) + '</p><div class="btnrow">' + a.rec.map(btn).join('') + '</div><p class="ent"><b>Entregable:</b> ' + esc(a.ent) + '</p>' +
+          (st === 'now' ? '<div class="next"><p class="note">Cuando termines esta actividad, márcala para desbloquear la siguiente.</p><button class="btn pri" type="button" data-done="' + a.c + '">' + (A.indexOf(a) === A.length - 1 ? 'Completar y terminar el curso' : 'Completar y pasar a la siguiente actividad') + '</button></div>' : '') + '</div>';
+      }
+      return '<article class="act ' + st + '" id="a-' + a.c + '"><button class="h" type="button" data-t="' + a.c + '" aria-expanded="' + open + '"' + (st === 'lock' ? ' aria-disabled="true"' : '') + '>' +
+        '<span class="k">' + (st === 'done' ? '✓' : st === 'lock' ? '🔒' : (i + 1)) + '</span><span><span class="h3">' + esc(a.titulo) + '</span><span class="tp">' + esc(a.tipo) + '</span></span><span class="st">' + stTxt + '</span></button>' + bd + '</article>';
+    }).join('');
+    if (!cur) html += '<div class="endbox"><h2>¡Completaste El mundo de los gases!</h2><p>Terminaste las ' + A.length + ' actividades de las tres semanas. Tu avance está al 100 %.</p><div class="btnrow"><a class="btn pri" href="avance.html">Ver mi avance</a><a class="btn" href="temas.html">Banco de temas</a></div></div>';
+    else if (as.every(a => hechas.has(a.c))){
+      const ns = S.find(x => x.id === cur.s);
+      html += '<div class="endbox"><h2>Sesión completada</h2><p>Sigue con ' + sesName(ns) + ': ' + esc(ns.titulo) + '.</p><div class="btnrow"><button class="btn pri" type="button" data-go="' + ns.id + '">Ir a la siguiente sesión</button></div></div>';
+    }
+    const m = document.getElementById('main'); m.innerHTML = html; QG.enlaces(m);
+    m.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const c = b.dataset.t, a = A.find(x => x.c === c); if (estado(a) === 'lock') return; if (abiertas.has(c)) abiertas.delete(c); else abiertas.add(c); pintarMain(); });
+    m.querySelectorAll('[data-done]').forEach(b => b.onclick = () => completar(b.dataset.done, b));
+    m.querySelectorAll('[data-go]').forEach(b => b.onclick = e => { e.preventDefault(); ir(b.dataset.go); });
+  }
+  function ir(id){ sid = id; abiertas.clear(); history.replaceState(null, '', 'ruta.html?s=' + id); pintarLado(); pintarMain(); scrollTo({ top: 0, behavior: 'smooth' }); }
+  async function completar(c, b){
+    if (ocupado) return; ocupado = true; b.disabled = true; b.textContent = 'Guardando…';
+    try {
+      const r = await QG.marcar(c);
+      if (!r || r.error){ b.disabled = false; b.textContent = 'Intentar de nuevo'; alertar(r && r.error === 'secuencia' ? 'Primero completa las actividades anteriores.' : 'No se pudo guardar. Revisa tu conexión.'); return; }
+      hechas = new Set(r.hechas.map(x => x.actividad));
+      pintarBarra(); pintarLado();
+      const sig = actual();
+      if (sig && sig.s === sid){ pintarMain(); const el = document.getElementById('a-' + sig.c); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      else pintarMain();
+    } catch(e){ b.disabled = false; b.textContent = 'Intentar de nuevo'; alertar('Sin conexión: no se pudo guardar tu avance. Inténtalo de nuevo.'); }
+    finally { ocupado = false; }
+  }
+  function alertar(t){ let el = document.getElementById('aviso'); if (!el){ el = document.createElement('div'); el.id = 'aviso'; el.className = 'banner'; el.setAttribute('role', 'alert'); document.getElementById('main').prepend(el); } el.textContent = t; }
+
+  QG.progreso().then(p => {
+    if (!p) return;
+    if (p.error){ document.getElementById('main').innerHTML = '<div class="banner">No se pudo cargar tu avance.</div>'; return; }
+    hechas = new Set(p.hechas.map(x => x.actividad));
+    pintarBarra(); pintarLado(); pintarMain();
+  }).catch(() => { document.getElementById('main').innerHTML = '<div class="banner">Sin conexión con el servidor. Revisa tu internet y recarga la página.</div>'; });
+})();
+</script>
+</body>
+</html>
